@@ -16,6 +16,12 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
+    public function Notif(): Response
+    {
+        return Inertia::render('Notification/Notif');
+    }
+
+    
     public function edit(Request $request): Response
     {
         return Inertia::render('Profile/Edit', [

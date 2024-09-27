@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,11 +14,56 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+               $userData = [
+            [
+                'name' => 'Admin User',
+                'email' => 'admin@example.com',
+                'role' => 'admin',
+                'password' => Hash::make('sandifox')
+            ],
+            [
+                'name' => 'Paramedis User',
+                'email' => 'paramedis@example.com',
+                'role' => 'paramedis',
+                'password' => Hash::make('sandifox'), 
+            ],
+            [
+                'name' => 'Cashier User',
+                'email' => 'cashier@example.com',
+                'role' => 'cashier',
+                'password' => Hash::make('sandifox'), 
+            ],
+            [
+                'name' => 'Doctor User',
+                'email' => 'doctor@example.com',
+                'role' => 'doctor',
+                'password' => Hash::make('sandifox'), 
+            ],
+            [
+                'name' => 'Manager User',
+                'email' => 'manager@example.com',
+                'role' => 'manager',
+                'password' => Hash::make('sandifox'), 
+            ],
+            [
+                'name' => 'Coordinator User',
+                'email' => 'cordi@example.com',
+                'role' => 'cordi',
+                'password' => Hash::make('sandifox'), 
+            ],
+            [
+                'name' => 'Patient User',
+                'email' => 'patient@example.com',
+                'role' => 'patients',
+                'password' => Hash::make('sandifox'), 
+            ],
+        ];
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Insert data into the users table
+        foreach ($userData as $key =>  $user) {
+            User::create($user);
+        }
+
+ 
     }
 }
