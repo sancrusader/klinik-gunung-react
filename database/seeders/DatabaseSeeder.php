@@ -25,37 +25,43 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Paramedis User',
                 'email' => 'paramedis@example.com',
                 'role' => 'paramedis',
-                'password' => Hash::make('sandifox'), 
+                'password' => Hash::make('sandifox'),
             ],
             [
                 'name' => 'Cashier User',
                 'email' => 'cashier@example.com',
                 'role' => 'cashier',
-                'password' => Hash::make('sandifox'), 
+                'password' => Hash::make('sandifox'),
             ],
             [
                 'name' => 'Doctor User',
                 'email' => 'doctor@example.com',
                 'role' => 'doctor',
-                'password' => Hash::make('sandifox'), 
+                'password' => Hash::make('sandifox'),
             ],
             [
                 'name' => 'Manager User',
                 'email' => 'manager@example.com',
                 'role' => 'manager',
-                'password' => Hash::make('sandifox'), 
+                'password' => Hash::make('sandifox'),
             ],
             [
                 'name' => 'Coordinator User',
                 'email' => 'cordi@example.com',
                 'role' => 'cordi',
-                'password' => Hash::make('sandifox'), 
+                'password' => Hash::make('sandifox'),
             ],
             [
                 'name' => 'Patient User',
                 'email' => 'patient@example.com',
                 'role' => 'patients',
-                'password' => Hash::make('sandifox'), 
+                'password' => Hash::make('sandifox'),
+            ],
+            [
+                'name' => 'Sandi',
+                'email' => 'sandimaulanafz@gmail.com',
+                'role' => 'patients',
+                'password' => Hash::make('sandifox'),
             ],
         ];
 
@@ -64,6 +70,6 @@ class DatabaseSeeder extends Seeder
             User::create($user);
         }
 
- 
+
     }
 }

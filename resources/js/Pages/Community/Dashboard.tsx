@@ -61,7 +61,7 @@ export default function Dashboard({
 
     return (
         <>
-            <Head title="Community klinik Gunung" />
+            <Head title="Community" />
             <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white flex flex-col">
                 {/* Header */}
                 <header className="sticky top-0 z-50 backdrop-blur-lg bg-gray-900/70 border-b border-gray-800">

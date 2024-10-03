@@ -2,7 +2,6 @@ import React from "react";
 import { PageProps } from "@/types";
 import CashierLayout from "@/Layouts/CashierLayout";
 import PaymentForm from "@/Components/PaymentForm";
-
 import {
     Table,
     TableBody,
@@ -12,7 +11,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/Components/ui/table";
-import { usePage, Head, Link } from "@inertiajs/react";
+import { usePage, Head } from "@inertiajs/react";
 
 interface Screening {
     id: number;
@@ -32,7 +31,6 @@ interface Props {
 
 export default function Payment({ auth }: PageProps) {
     const { screenings = [] } = usePage().props as Props;
-
     return (
         <CashierLayout
             user={auth.user}
@@ -65,7 +63,7 @@ export default function Payment({ auth }: PageProps) {
                                             Planned Hiking Date
                                         </TableHead>
                                         <TableHead>Previous Hikes</TableHead>
-                                        <TableHead>Status Health</TableHead>
+                                        <TableHead>Amount Paid</TableHead>
                                         <TableHead>Confirm Payment</TableHead>
                                     </TableRow>
                                 </TableHeader>

@@ -6,6 +6,8 @@ import { CalendarDateRangePicker } from "@/Components/date-range-picker";
 import PageContainer from "@/Layouts/PageContainer";
 import { Button } from "@/Components/ui/button";
 import Header from "@/Layouts/HeaderParamedis";
+import { Head } from "@inertiajs/react";
+
 import {
     Card,
     CardContent,
@@ -27,6 +29,7 @@ export default function page({
 }>) {
     return (
         <Header user={auth.user}>
+            <Head title="Dashboard" />
             <PageContainer scrollable={true}>
                 <div className="space-y-2">
                     <div className="flex items-center justify-between space-y-2">
@@ -173,9 +176,9 @@ export default function page({
                                 </div>
                                 <Card className="col-span-4 md:col-span-3">
                                     <CardHeader>
-                                        <CardTitle>Recent Sales</CardTitle>
+                                        <CardTitle>Recent Screening</CardTitle>
                                         <CardDescription>
-                                            You made 265 sales this month.
+                                            You made screening this month.
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>

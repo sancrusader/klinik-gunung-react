@@ -1,13 +1,20 @@
 "use client";
 
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { FormEvent, useState } from "react";
-import { router, useForm, usePage, Head } from "@inertiajs/react";
+import React, { useState, FormEvent } from "react";
+import { useForm, Head } from "@inertiajs/react";
+import { Checkbox } from "@/Components/ui/checkbox";
 import { Button } from "@/Components/ui/button";
-import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
-import { PageProps } from "@/types";
-
+import { Alert, AlertDescription } from "@/Components/ui/alert";
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Input } from "@/Components/ui/input";
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+} from "@/Components/ui/card";
 import {
     Select,
     SelectContent,
@@ -15,33 +22,88 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/Components/ui/select";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/Components/ui/card";
-import { Alert, AlertDescription } from "@/Components/ui/alert";
 
-const Offline = ({ auth }: PageProps) => {
-    // const { auth } = usePage().props;
+interface Screening {
+    id: number;
+    is_filled?: boolean;
+}
+
+interface Auth {
+    user: {
+        id: number;
+        name: string;
+        email: string;
+    };
+}
+
+interface Questions {
+    [key: string]: string;
+}
+
+type FormData = {
+    full_name: string;
+    age: string;
+    gender: string;
+    contact_number: string;
+    planned_hiking_date: string;
+    previous_hikes_count: string;
+    [key: string]: string | string[]; // Ini mengizinkan properti dinamis dengan tipe string[] untuk pertanyaan
+};
+
+const Offline: React.FC<{
+    screening: Screening;
+    questions: Questions;
+    auth: Auth;
+}> = ({ screening, questions, auth }) => {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
-    const { data, setData, processing, errors, reset } = useForm({
+
+    const initialData: FormData = {
         full_name: "",
         age: "",
         gender: "",
         contact_number: "",
         planned_hiking_date: "",
         previous_hikes_count: "",
-    });
+        // Menambahkan data dinamis untuk questions, yang akan menjadi array string
+        ...Object.keys(questions).reduce(
+            (acc, key) => ({ ...acc, [key]: [] }),
+            {} as { [key: string]: string[] }
+        ),
+    };
 
-    const storeScreening = (e: FormEvent<HTMLFormElement>) => {
+    const { data, setData, post, processing, errors } =
+        useForm<FormData>(initialData);
+
+    const [tempInputs, setTempInputs] = useState<{ [key: string]: string }>({});
+
+    const handleCheckboxChange = (name: keyof FormData, value: string) => {
+        const currentValue = data[name] as string[];
+        setData(
+            name,
+            currentValue.includes(value)
+                ? currentValue.filter((item) => item !== value)
+                : [...currentValue, value]
+        );
+    };
+
+    const handleArrayInputChange = (name: keyof FormData, value: string) => {
+        setTempInputs({ ...tempInputs, [name]: value });
+    };
+
+    const handleArrayInputSubmit = (name: keyof FormData) => {
+        const value = tempInputs[name];
+        if (value?.trim()) {
+            const currentValue = data[name] as string[];
+            setData(name, [...currentValue, value.trim()]);
+            setTempInputs({ ...tempInputs, [name]: "" });
+        }
+    };
+
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
-        router.post("/dashboard/screening/offline", data, {
+        post(route("screening.offline.store"), {
             onSuccess: () => {
                 setSuccessMessage("Screening form submitted successfully!");
-                reset();
             },
             onError: () => {
                 setSuccessMessage(null);
@@ -49,206 +111,327 @@ const Offline = ({ auth }: PageProps) => {
         });
     };
 
+    const renderQuestion = (
+        questionKey: keyof Questions,
+        options: string[]
+    ) => (
+        <li key={questionKey}>
+            <p className="font-medium mb-2">{questions[questionKey]}</p>
+            <div className="space-y-2">
+                {options.map((option) => (
+                    <div key={option} className="flex items-center space-x-2">
+                        <Checkbox
+                            id={`${questionKey}-${option}`}
+                            checked={(data[questionKey] as string[]).includes(
+                                option
+                            )}
+                            onCheckedChange={() =>
+                                handleCheckboxChange(questionKey, option)
+                            }
+                        />
+                        <Label htmlFor={`${questionKey}-${option}`}>
+                            {option}
+                        </Label>
+                    </div>
+                ))}
+            </div>
+            {errors[questionKey] && (
+                <Alert variant="destructive" className="mt-2">
+                    <AlertDescription>{errors[questionKey]}</AlertDescription>
+                </Alert>
+            )}
+        </li>
+    );
+
+    const renderArrayInputQuestion = (questionKey: keyof Questions) => (
+        <li key={questionKey}>
+            <p className="font-medium mb-2">{questions[questionKey]}</p>
+            <div className="space-y-2">
+                {["Ya", "Tidak"].map((option) => (
+                    <div key={option} className="flex items-center space-x-2">
+                        <Checkbox
+                            id={`${questionKey}-${option}`}
+                            checked={(data[questionKey] as string[]).includes(
+                                option
+                            )}
+                            onCheckedChange={() =>
+                                handleCheckboxChange(questionKey, option)
+                            }
+                        />
+                        <Label htmlFor={`${questionKey}-${option}`}>
+                            {option}
+                        </Label>
+                    </div>
+                ))}
+            </div>
+            <div className="flex items-center space-x-2 mt-2">
+                <Input
+                    value={tempInputs[questionKey] || ""}
+                    onChange={(e) =>
+                        handleArrayInputChange(questionKey, e.target.value)
+                    }
+                    placeholder="Sebutkan.."
+                />
+                <Button
+                    type="button"
+                    onClick={() => handleArrayInputSubmit(questionKey)}
+                >
+                    Add
+                </Button>
+            </div>
+            <div className="mt-2">
+                {(data[questionKey] as string[]).map((item, index) => (
+                    <div
+                        key={index}
+                        className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                    >
+                        {item}
+                    </div>
+                ))}
+            </div>
+            {errors[questionKey] && (
+                <Alert variant="destructive" className="mt-2">
+                    <AlertDescription>{errors[questionKey]}</AlertDescription>
+                </Alert>
+            )}
+        </li>
+    );
+
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Create Screening offline
-                </h2>
-            }
-        >
-            <Head title="Create Screening" />
+        <AuthenticatedLayout user={auth.user}>
+            <Head title="Screening Offline" />
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className=" overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            <Card className="w-full max-w-2xl mx-auto">
-                                <CardHeader>
-                                    <CardTitle>
-                                        Offline Hiking Screening
-                                    </CardTitle>
-                                    <CardDescription>
-                                        Please fill out the form below for your
-                                        hiking screening.
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    {successMessage && (
-                                        <Alert className="mb-4">
-                                            <AlertDescription>
-                                                {successMessage}
-                                            </AlertDescription>
-                                        </Alert>
-                                    )}
-                                    <form
-                                        onSubmit={storeScreening}
-                                        className="space-y-4"
-                                    >
-                                        <div className="space-y-2">
-                                            <Label htmlFor="full_name">
-                                                Full Name
-                                            </Label>
-                                            <Input
-                                                id="full_name"
-                                                type="text"
-                                                name="full_name"
-                                                value={data.full_name}
-                                                onChange={(e) =>
-                                                    setData(
-                                                        "full_name",
-                                                        e.target.value
-                                                    )
-                                                }
-                                            />
-                                            {errors.full_name && (
-                                                <p className="text-sm text-red-500">
-                                                    {errors.full_name}
-                                                </p>
-                                            )}
-                                        </div>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Screening Form</CardTitle>
+                            <CardDescription>
+                                Please fill out the form below for your hiking
+                                screening.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {successMessage && (
+                                <Alert className="mb-4">
+                                    <AlertDescription>
+                                        {successMessage}
+                                    </AlertDescription>
+                                </Alert>
+                            )}
+                            <form onSubmit={handleSubmit} className="space-y-8">
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="full_name">
+                                            Full Name
+                                        </Label>
+                                        <Input
+                                            id="full_name"
+                                            type="text"
+                                            name="full_name"
+                                            value={data.full_name}
+                                            onChange={(e) =>
+                                                setData(
+                                                    "full_name",
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+                                        {errors.full_name && (
+                                            <p className="text-sm text-red-500">
+                                                {errors.full_name}
+                                            </p>
+                                        )}
+                                    </div>
 
-                                        <div className="space-y-2">
-                                            <Label htmlFor="age">Age</Label>
-                                            <Input
-                                                id="age"
-                                                type="number"
-                                                name="age"
-                                                value={data.age}
-                                                onChange={(e) =>
-                                                    setData(
-                                                        "age",
-                                                        e.target.value
-                                                    )
-                                                }
-                                            />
-                                            {errors.age && (
-                                                <p className="text-sm text-red-500">
-                                                    {errors.age}
-                                                </p>
-                                            )}
-                                        </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="age">Age</Label>
+                                        <Input
+                                            id="age"
+                                            type="number"
+                                            name="age"
+                                            value={data.age}
+                                            onChange={(e) =>
+                                                setData("age", e.target.value)
+                                            }
+                                        />
+                                        {errors.age && (
+                                            <p className="text-sm text-red-500">
+                                                {errors.age}
+                                            </p>
+                                        )}
+                                    </div>
 
-                                        <div className="space-y-2">
-                                            <Label htmlFor="gender">
-                                                Gender
-                                            </Label>
-                                            <Select
-                                                name="gender"
-                                                value={data.gender}
-                                                onValueChange={(value) =>
-                                                    setData("gender", value)
-                                                }
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select gender" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="male">
-                                                        Male
-                                                    </SelectItem>
-                                                    <SelectItem value="female">
-                                                        Female
-                                                    </SelectItem>
-                                                    <SelectItem value="other">
-                                                        Other
-                                                    </SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            {errors.gender && (
-                                                <p className="text-sm text-red-500">
-                                                    {errors.gender}
-                                                </p>
-                                            )}
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label htmlFor="contact_number">
-                                                Contact Number
-                                            </Label>
-                                            <Input
-                                                id="contact_number"
-                                                type="tel"
-                                                name="contact_number"
-                                                value={data.contact_number}
-                                                onChange={(e) =>
-                                                    setData(
-                                                        "contact_number",
-                                                        e.target.value
-                                                    )
-                                                }
-                                            />
-                                            {errors.contact_number && (
-                                                <p className="text-sm text-red-500">
-                                                    {errors.contact_number}
-                                                </p>
-                                            )}
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label htmlFor="planned_hiking_date">
-                                                Planned Hiking Date
-                                            </Label>
-                                            <Input
-                                                id="planned_hiking_date"
-                                                type="date"
-                                                name="planned_hiking_date"
-                                                value={data.planned_hiking_date}
-                                                onChange={(e) =>
-                                                    setData(
-                                                        "planned_hiking_date",
-                                                        e.target.value
-                                                    )
-                                                }
-                                            />
-                                            {errors.planned_hiking_date && (
-                                                <p className="text-sm text-red-500">
-                                                    {errors.planned_hiking_date}
-                                                </p>
-                                            )}
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label htmlFor="previous_hikes_count">
-                                                Number of Previous Hikes
-                                            </Label>
-                                            <Input
-                                                id="previous_hikes_count"
-                                                type="number"
-                                                name="previous_hikes_count"
-                                                value={
-                                                    data.previous_hikes_count
-                                                }
-                                                onChange={(e) =>
-                                                    setData(
-                                                        "previous_hikes_count",
-                                                        e.target.value
-                                                    )
-                                                }
-                                            />
-                                            {errors.previous_hikes_count && (
-                                                <p className="text-sm text-red-500">
-                                                    {
-                                                        errors.previous_hikes_count
-                                                    }
-                                                </p>
-                                            )}
-                                        </div>
-
-                                        <Button
-                                            type="submit"
-                                            className="w-full"
-                                            disabled={processing}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="gender">Gender</Label>
+                                        <Select
+                                            name="gender"
+                                            value={data.gender}
+                                            onValueChange={(value) =>
+                                                setData("gender", value)
+                                            }
                                         >
-                                            {processing
-                                                ? "Submitting..."
-                                                : "Submit"}
-                                        </Button>
-                                    </form>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </div>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select gender" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="male">
+                                                    Male
+                                                </SelectItem>
+                                                <SelectItem value="female">
+                                                    Female
+                                                </SelectItem>
+                                                <SelectItem value="other">
+                                                    Other
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.gender && (
+                                            <p className="text-sm text-red-500">
+                                                {errors.gender}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="contact_number">
+                                            Contact Number
+                                        </Label>
+                                        <Input
+                                            id="contact_number"
+                                            type="tel"
+                                            name="contact_number"
+                                            value={data.contact_number}
+                                            onChange={(e) =>
+                                                setData(
+                                                    "contact_number",
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+                                        {errors.contact_number && (
+                                            <p className="text-sm text-red-500">
+                                                {errors.contact_number}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="planned_hiking_date">
+                                            Planned Hiking Date
+                                        </Label>
+                                        <Input
+                                            id="planned_hiking_date"
+                                            type="date"
+                                            name="planned_hiking_date"
+                                            value={data.planned_hiking_date}
+                                            onChange={(e) =>
+                                                setData(
+                                                    "planned_hiking_date",
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+                                        {errors.planned_hiking_date && (
+                                            <p className="text-sm text-red-500">
+                                                {errors.planned_hiking_date}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="previous_hikes_count">
+                                            Number of Previous Hikes (mdpl)
+                                        </Label>
+                                        <Input
+                                            id="previous_hikes_count"
+                                            type="number"
+                                            name="previous_hikes_count"
+                                            value={data.previous_hikes_count}
+                                            onChange={(e) =>
+                                                setData(
+                                                    "previous_hikes_count",
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+                                        {errors.previous_hikes_count && (
+                                            <p className="text-sm text-red-500">
+                                                {errors.previous_hikes_count}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <ol className="space-y-6 list-decimal list-inside">
+                                    {renderQuestion("physical_health_q1", [
+                                        "Penyakit Jantung",
+                                        "Hipertensi (tekanan darah tinggi)",
+                                        "Hipotensi(tekanan darah rendah)",
+                                        "Diabetes",
+                                        "Masalah paru-paru lainnya",
+                                        "Cedera sendi/lutut/pergelangan kaki",
+                                        "Tidak ada dari yang disebutkan",
+                                    ])}
+                                    {renderQuestion("physical_health_q2", [
+                                        "Kurang Dari 6 bulan yang lalu",
+                                        "6 bulan - 1 tahun lalu",
+                                        "Lebih dari 1 tahun lalu",
+                                        "Belum pernah melakukan",
+                                    ])}
+                                    {renderQuestion("physical_health_q3", [
+                                        "Pernapasan saat berolahraga berat",
+                                        "Daya tahan tubuh saat melakukan aktivitas",
+                                        "Tidak ada masalah di atas",
+                                    ])}
+                                    {renderArrayInputQuestion(
+                                        "physical_health_q4"
+                                    )}
+                                    {renderQuestion("physical_health_q5", [
+                                        "Sangat Baik",
+                                        "Baik",
+                                        "Cukup",
+                                        "Buruk",
+                                    ])}
+                                    {renderArrayInputQuestion(
+                                        "physical_health_q6"
+                                    )}
+                                    {renderQuestion("experience_knowledge_q1", [
+                                        "Ya",
+                                        "Tidak",
+                                    ])}
+                                    {renderQuestion("experience_knowledge_q2", [
+                                        "Ya",
+                                        "Tidak",
+                                    ])}
+                                    {renderQuestion("experience_knowledge_q3", [
+                                        "Ya",
+                                        "Tidak",
+                                    ])}
+                                    {renderQuestion("experience_knowledge_q4", [
+                                        "Peta dan kompas/GPS",
+                                        "Pisau multi-fungsi",
+                                        "Kit pertolongan pertama",
+                                        "Lampu senter/headlamp",
+                                        "Tidak membawa atau tidak tahu cara menggunakannya",
+                                    ])}
+                                    {renderQuestion("experience_knowledge_q5", [
+                                        "Membawa pakaian waterproof dan windproof",
+                                        "Membawa pakaian berlapis untuk ketinggian",
+                                        "Membawa jas hujan atau ponco",
+                                        "Tidak tahu apa yang harus dibawa",
+                                    ])}
+                                </ol>
+
+                                <Button
+                                    type="submit"
+                                    className="w-full"
+                                    disabled={processing}
+                                >
+                                    {processing ? "Submitting..." : "Submit"}
+                                </Button>
+                            </form>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </AuthenticatedLayout>

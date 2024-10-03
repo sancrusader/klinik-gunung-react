@@ -4,7 +4,6 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <title inertia>{{ config('app.name', 'Klinik Gunung') }}</title>
 
     <!-- Fonts -->

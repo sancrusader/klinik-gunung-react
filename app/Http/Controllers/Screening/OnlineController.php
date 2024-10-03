@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Screening;
 
 use Inertia\Inertia;
+use App\Mail\QrCodeMail;
 use Illuminate\Http\Request;
 use App\Models\Screening\Online;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class OnlineController extends Controller
 {
@@ -60,13 +63,13 @@ class OnlineController extends Controller
             'queue_number' => $this->generateQueueNumber(),
         ]);
 
-        return redirect()->route('screening.payment', $screening->id);
+       return redirect()->route('screenings.payment', $screening->id);
     }
 
     public function payment($id)
     {
         $screening = Online::findOrFail($id);
-        return view('Patients/Screening/PaymentOnline', compact('screening'));
+        return inertia('Patients/Screening/PaymentOnline', compact('screening'));
     }
 
     public function paymentCallback(Request $request)
@@ -100,24 +103,39 @@ class OnlineController extends Controller
         return redirect()->route('screenings.index')->with('success', 'Pembayaran berhasil, QR code telah dikirim.');
     }
 
-    public function confirmPayment($id)
+
+    public function confirmPayment(Request $request, $id)
     {
         $screening = Online::findOrFail($id);
 
-        if ($screening->payment_status) {
+        if ($screening->payment_status && !$screening->qr_code_sent) {
             $screening->payment_confirmed = true;
             $screening->save();
 
-            $certificatePath = $this->generateCertificate($screening);
+            // Generate QR Code
+            $qrCodeData = json_encode($screening->toArray());
+            $qrCodeImage = QrCode::format('png')->size(200)->generate($qrCodeData);
+            $path = storage_path('app/public/qrcodes/');
+            $filename = 'qrcode_' . $screening->id . '.png';
 
-            $screening->certificate_path = $certificatePath;
-            $screening->certificate_issued = true;
+            if (!is_dir($path)) {
+                mkdir($path, 0777, true);
+            }
+
+            file_put_contents($path . $filename, $qrCodeImage);
+            $qrCodeUrl = asset('storage/qrcodes/' . $filename);
+
+            $screening->qr_code_url = $qrCodeUrl;
+            $screening->qr_code_sent = true;
             $screening->save();
 
-            return redirect()->route('kasir.index')->with('success', 'Pembayaran berhasil dikonfirmasi dan sertifikat telah dibuat.');
+            // Send QR Code to Email
+            Mail::to($screening->email)->send(new QrCodeMail($screening, $qrCodeUrl));
+
+            return redirect()->route('cashier.screening.online')->with('success', 'Pembayaran dikonfirmasi dan QR code telah dikirim.');
         }
 
-        return redirect()->route('kasir.index')->with('error', 'Pembayaran belum dilakukan.');
+        return redirect()->route('cashier.screening.online')->with('error', 'Pembayaran belum dilakukan atau QR code sudah dikirim.');
     }
 
     public function ScreeningOnlinePayment()

@@ -48,7 +48,7 @@ export default function CreateAppointment({ auth, doctors }: Props) {
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        post(route("appointment.store"), {
+        post(route("appointment.create"), {
             preserveState: true,
             onSuccess: () => {
                 setSuccessMessage("Appointment submitted successfully!");

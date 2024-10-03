@@ -21,7 +21,7 @@ class OfflineRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+            $rules = [
             'full_name' => 'required|string|max:255',
             'age' => 'required|integer',
             'gender' => 'required|string',
@@ -29,5 +29,17 @@ class OfflineRequest extends FormRequest
             'planned_hiking_date' => 'required|date',
             'previous_hikes_count' => 'required|integer',
         ];
+        // Loop untuk kategori 'physical_health'
+        foreach (range(1, 6) as $index) {
+            $rules["physical_health_q{$index}"] = 'nullable|array';
+            $rules["physical_health_q{$index}.*"] = 'string';
+        }
+
+        // Loop untuk kategori 'experience_knowledge'
+        foreach (range(1, 5) as $index) {
+            $rules["experience_knowledge_q{$index}"] = 'nullable|array';
+            $rules["experience_knowledge_q{$index}.*"] = 'string';
+        }
+        return $rules;
     }
 }

@@ -21,11 +21,11 @@ public function handle($request, Closure $next, $role)
     if (!Auth::check() || Auth::user()->role !== $role) {
         // Mapping role ke route
         $roleRedirects = [
-            'admin' => 'admin.welcome',
+            'admin' => 'admin.dashboard',
             'doctor' => 'doctor.dashboard',
             'cashier' => 'cashier.dashboard',
-            'cordi' => 'koordinator.welcome',
-            'manager' => 'manajer.welcome',
+            'cordi' => 'cordi.dashboard',
+            'manager' => 'manager.dashboard',
             'paramedis' => 'paramedis.dashboard',
             'patients' => 'dashboard',
         ];

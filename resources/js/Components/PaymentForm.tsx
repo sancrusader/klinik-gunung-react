@@ -1,59 +1,119 @@
-import React, { useState } from "react";
+import React from "react";
 import { useForm } from "@inertiajs/react";
+import { useForm as useHookForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+    Select,
+    SelectTrigger,
+    SelectContent,
+    SelectItem,
+    SelectValue,
+} from "@/Components/ui/select";
+import { Button } from "@/Components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import {
+    Form,
+    FormField,
+    FormItem,
+    FormControl,
+    FormMessage,
+} from "@/Components/ui/form";
 
-// Definisikan tipe untuk screening
 interface Screening {
     id: number;
-    full_name: string;
-    queue_number: number;
-    payment_status: boolean; // Pastikan ada field payment_status
+    payment_status: boolean;
 }
 
-const PaymentForm: React.FC<{ screening: Screening }> = ({ screening }) => {
-    const { data, setData, post, processing } = useForm({
-        amount_paid: "",
+const formSchema = z.object({
+    amount_paid: z.enum(["25000", "5000"]),
+});
+
+export default function PaymentForm({ screening }: { screening: Screening }) {
+    const { post, processing } = useForm();
+    const { toast } = useToast();
+
+    const form = useHookForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            amount_paid: "25000",
+        },
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        post(route("cashier.payment.offline", screening.id));
+    const onSubmit = () => {
+        const values = form.getValues(); // Mendapatkan nilai dari form
+        post(route("cashier.payment.offline", screening.id), {
+            data: values, // Hanya mengirim values
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                toast({
+                    title: "Pembayaran Berhasil",
+                    description: "Pembayaran telah dikonfirmasi.",
+                });
+                form.reset();
+            },
+            onError: (errors) => {
+                toast({
+                    title: "Pembayaran Gagal",
+                    description: "Terjadi kesalahan saat memproses pembayaran.",
+                    variant: "destructive",
+                });
+                Object.keys(errors).forEach((key) => {
+                    form.setError(key as keyof z.infer<typeof formSchema>, {
+                        type: "manual",
+                        message: errors[key],
+                    });
+                });
+            },
+        });
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-                <label
-                    htmlFor="amount_paid"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-200"
+        <div className="w-full max-w-xs">
+            <Form {...form}>
+                <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="flex items-center space-x-2"
                 >
-                    Jumlah Pembayaran
-                </label>
-                <input
-                    type="number"
-                    name="amount_paid"
-                    id="amount_paid"
-                    value={data.amount_paid}
-                    onChange={(e) => setData("amount_paid", e.target.value)}
-                    required
-                    className="block w-full p-2.5 text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    placeholder="Masukkan jumlah pembayaran"
-                />
-            </div>
-            <button
-                type="submit"
-                disabled={screening.payment_status || processing}
-                className={`inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg ${
-                    screening.payment_status
-                        ? "bg-gray-500"
-                        : "bg-primary-700 hover:bg-primary-800"
-                } focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800`}
-            >
-                {screening.payment_status
-                    ? "Pembayaran Dikonfirmasi"
-                    : "Konfirmasi Pembayaran"}
-            </button>
-        </form>
+                    <FormField
+                        control={form.control}
+                        name="amount_paid"
+                        render={({ field }) => (
+                            <FormItem className="flex-grow">
+                                <FormControl>
+                                    <Select
+                                        name="amount_paid"
+                                        value={field.value}
+                                        onValueChange={field.onChange}
+                                        disabled={screening.payment_status}
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Pilih jumlah pembayaran" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="25000">
+                                                25000
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormMessage className="text-xs" />
+                            </FormItem>
+                        )}
+                    />
+                    <Button
+                        type="submit"
+                        disabled={screening.payment_status || processing}
+                    >
+                        {screening.payment_status
+                            ? "Lunas"
+                            : processing
+                            ? "Proses..."
+                            : "Bayar"}
+                    </Button>
+                </form>
+            </Form>
+        </div>
     );
-};
-
-export default PaymentForm;
+}

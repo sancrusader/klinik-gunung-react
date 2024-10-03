@@ -43,7 +43,7 @@ class Offline extends Model
 
     // Cast atribut ke tipe data tertentu
     protected $casts = [
-        'health_check_result' => 'boolean',
+        'health_check_result' => 'string',
         'payment_status' => 'boolean',
         'certificate_issued' => 'boolean',
     ];

@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { PageProps } from "@/types";
 import CashierLayout from "@/Layouts/CashierLayout";
-import { usePage, Head, Link } from "@inertiajs/react";
+import { usePage, Head, router } from "@inertiajs/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
-import { CalendarIcon, PlusIcon, SearchIcon, UserIcon } from "lucide-react";
+import { SearchIcon } from "lucide-react";
 import {
     Table,
     TableBody,
@@ -15,11 +15,13 @@ import {
     TableHeader,
     TableRow,
 } from "@/Components/ui/table";
+
 export default function PaymentOnline({
     auth,
     screenings = [],
 }: PageProps<{
     screenings?: {
+        id: number;
         full_name: string;
         date_of_birth: string;
         mountain: string;
@@ -27,10 +29,25 @@ export default function PaymentOnline({
         country: string;
         address: string;
         phone: number;
-        payment_status: string;
+        payment_status: string; // Use boolean for easier checks
     }[];
     latestScreening?: string;
 }>) {
+    const confirmPayment = (id: number) => {
+        router.post(
+            route("kasir.confirmPayment", { id }),
+            {},
+            {
+                onSuccess: () => {
+                    alert("Payment confirmed successfully!");
+                },
+                onError: () => {
+                    alert("Failed to confirm payment.");
+                },
+            }
+        );
+    };
+
     return (
         <>
             <CashierLayout
@@ -64,7 +81,7 @@ export default function PaymentOnline({
                                 </div>
                                 <Table>
                                     <TableCaption>
-                                        List of Offline Screening Entries
+                                        List of Online Screening Entries
                                     </TableCaption>
                                     <TableHeader>
                                         <TableRow>
@@ -81,7 +98,7 @@ export default function PaymentOnline({
                                     </TableHeader>
                                     <TableBody>
                                         {screenings.map((screening) => (
-                                            <TableRow>
+                                            <TableRow key={screening.id}>
                                                 <TableCell className="font-medium">
                                                     {screening.full_name}
                                                 </TableCell>
@@ -104,7 +121,24 @@ export default function PaymentOnline({
                                                     {screening.phone}
                                                 </TableCell>
                                                 <TableCell className="font-medium">
-                                                    {screening.payment_status}
+                                                    {screening.payment_status ===
+                                                    "paid"
+                                                        ? "Paid"
+                                                        : "Pending"}
+                                                </TableCell>
+                                                <TableCell className="font-medium">
+                                                    {screening.payment_status !==
+                                                        "paid" && (
+                                                        <Button
+                                                            onClick={() =>
+                                                                confirmPayment(
+                                                                    screening.id
+                                                                )
+                                                            }
+                                                        >
+                                                            Confirm Payment
+                                                        </Button>
+                                                    )}
                                                 </TableCell>
                                             </TableRow>
                                         ))}

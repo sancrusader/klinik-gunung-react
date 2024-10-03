@@ -33,6 +33,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
     return (
         <section className="flex h-screen items-center justify-center">
+            <Head title="Login" />
             <Card className="mx-auto w-full max-w-sm">
                 <CardHeader>
                     <CardTitle className="text-2xl">Login</CardTitle>

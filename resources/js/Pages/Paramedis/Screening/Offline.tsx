@@ -1,9 +1,8 @@
 import React from "react";
 import { PageProps } from "@/types";
-import ParamedisLayout from "@/Layouts/ParamedisLayout";
-import HealthCheckForm from "@/Components/HealthCheckForm";
 import PageContainer from "@/Layouts/PageContainer";
 import Header from "@/Layouts/HeaderParamedis";
+
 import {
     Table,
     TableBody,
@@ -15,17 +14,7 @@ import {
 } from "@/Components/ui/table";
 import { usePage, Head, Link } from "@inertiajs/react";
 
-interface Screening {
-    id: number;
-    full_name: string;
-    queue_number: number;
-    age: number;
-    gender: string;
-    contact_number: string;
-    planned_hiking_date: string;
-    previous_hikes_count: number;
-    health_check_result: string;
-}
+import { Screening } from "@/types/screening";
 
 interface Props {
     screenings?: Screening[];
@@ -46,16 +35,16 @@ export default function Offline({ auth }: PageProps) {
                     <TableHeader>
                         <TableRow>
                             <TableHead className="w-[100px]">
-                                Queue Number
+                                Nomor Antrian
                             </TableHead>
-                            <TableHead>Full Name</TableHead>
-                            <TableHead>Age</TableHead>
-                            <TableHead>Gender</TableHead>
-                            <TableHead>Contact Number</TableHead>
+                            <TableHead>Nama Lengkap</TableHead>
+                            <TableHead>Umur</TableHead>
+                            <TableHead>Jenis Kelamin</TableHead>
+                            <TableHead>Kontak</TableHead>
                             <TableHead>Planned Hiking Date</TableHead>
                             <TableHead>Previous Hikes</TableHead>
                             <TableHead>Questioner</TableHead>
-                            <TableHead>Status Health</TableHead>
+                            <TableHead>Status Kesahatan</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -75,17 +64,24 @@ export default function Offline({ auth }: PageProps) {
                                     {screening.previous_hikes_count}
                                 </TableCell>
                                 <TableCell>
-                                    <Link
-                                        className="text-blue-600"
-                                        href={route("paramedis.questioner", {
-                                            id: screening.id,
-                                        })}
-                                    >
-                                        Questioner
-                                    </Link>
+                                        <Link
+                                            className="text-blue-600"
+                                            href={route(
+                                                "paramedis.questioner.detail",
+                                                {
+                                                    id: screening.id,
+                                                }
+                                            )}
+                                        >
+                                            Sudah Mengisi
+                                        </Link>
                                 </TableCell>
                                 <TableCell>
-                                    <HealthCheckForm screening={screening} />
+                                    <TableCell>
+                                            <span>
+                                                {screening.health_check_result}
+                                            </span>
+                                    </TableCell>
                                 </TableCell>
                             </TableRow>
                         ))}

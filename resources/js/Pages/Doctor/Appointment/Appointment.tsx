@@ -203,7 +203,6 @@ export default function DoctorAppointments({ auth }: Props) {
                                                             )
                                                         }
                                                         size="sm"
-                                                        
                                                     >
                                                         Complete
                                                     </Button>

@@ -29,18 +29,20 @@ public function ScreeningOffline()
 }
     public function confirmPaymentOffline(Request $request, $id)
     {
+
         $screening = Offline::findOrFail($id);
         $screening->payment_status = true;
-        $screening->amount_paid = $request->amount_paid;
+        $screening->amount_paid = 25000; // Ensure this field exists
         $screening->save();
 
+        // Handle certificate generation if needed
         $certificatePath = $this->generateCertificateOffline($screening);
         $screening->certificate_path = $certificatePath;
         $screening->save();
 
-        return redirect()->route('cashier.dashboard')->with('success', 'Pembayaran berhasil dikonfirmasi dan sertifikat telah dibuat.');
     }
-    
+
+
     private function generateCertificateOffline($screening)
     {
         $data = [
@@ -63,6 +65,7 @@ public function ScreeningOffline()
         return $path . $filename;
     }
 
+
     public function history()
     {
         $paidScreenings = Offline::where('payment_status', true)->get();
@@ -76,5 +79,5 @@ public function ScreeningOffline()
     ]);
     }
 
-    
+
 }

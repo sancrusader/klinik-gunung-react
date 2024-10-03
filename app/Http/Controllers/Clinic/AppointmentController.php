@@ -37,8 +37,6 @@ class AppointmentController extends Controller
         ]);
     }
 
-
-
     public function store(AppointmentRequest $request)
     {
         // Menyimpan data appointment
@@ -118,6 +116,27 @@ class AppointmentController extends Controller
 
         // Mengembalikan view dengan detail medical record
         return Inertia::render('Appointments/MedicalRecord', [
+            'record' => [
+                'id' => $appointment->id,
+                'medical_notes' => $appointment->medical_notes,
+                'prescription' => $appointment->prescription,
+                'examination_photo' => $appointment->examination_photo 
+                    ? Storage::url($appointment->examination_photo) 
+                    : null,
+                'patient_name' => $appointment->user->name,
+            ],
+        ]);
+    }
+
+        public function showMedicalRecordDetailDoctor($id)
+    {
+        // Mencari appointment dengan relasi user
+        $appointment = Appointment::with('user')->findOrFail($id);
+
+        // Memastikan bahwa pengguna yang saat ini terautentikasi adalah pemilik appointment
+
+        // Mengembalikan view dengan detail medical record
+        return Inertia::render('Doctor/Appointment/Detail', [
             'record' => [
                 'id' => $appointment->id,
                 'medical_notes' => $appointment->medical_notes,

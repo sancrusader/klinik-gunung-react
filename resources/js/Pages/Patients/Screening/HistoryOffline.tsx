@@ -1,4 +1,3 @@
-import React from "react";
 import { PageProps } from "@/types";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { usePage, Head, Link } from "@inertiajs/react";
@@ -15,18 +14,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { CalendarIcon, PlusIcon, SearchIcon, UserIcon } from "lucide-react";
+import { Screening } from "@/types/screening";
 
-interface Screening {
-    id: number;
-    full_name: string;
-    queue_number: number;
-    age: number;
-    gender: string;
-    contact_number: string;
-    planned_hiking_date: string;
-    previous_hikes_count: number;
-    health_check_result: string;
-}
 
 interface Props extends PageProps {
     screenings: Screening[];
@@ -40,7 +29,7 @@ export default function OfflineList({ auth }: Props) {
             user={auth.user}
             header={
                 <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Offline Screening
+                    Screening Now
                 </h2>
             }
         >
@@ -51,7 +40,7 @@ export default function OfflineList({ auth }: Props) {
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-2xl font-bold">
-                                Offline Screening List
+                                Screening {auth.user.name}
                             </CardTitle>
                             <Link href={route("screening.offline")}>
                                 <Button>
@@ -78,17 +67,20 @@ export default function OfflineList({ auth }: Props) {
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead className="w-[100px]">
-                                            Queue Number
+                                            Antrian
                                         </TableHead>
-                                        <TableHead>Full Name</TableHead>
-                                        <TableHead>Age</TableHead>
-                                        <TableHead>Gender</TableHead>
+                                        <TableHead>Nama Lengkap</TableHead>
+                                        <TableHead>Umur</TableHead>
+                                        <TableHead>Jenis Kelamin</TableHead>
                                         <TableHead>Contact Number</TableHead>
                                         <TableHead>
-                                            Planned Hiking Date
+                                            Tanggal Rencana Pendakian
                                         </TableHead>
-                                        <TableHead>Previous Hikes</TableHead>
+                                        <TableHead>
+                                            Jumlah Pendakian Sebelumnya
+                                        </TableHead>
                                         <TableHead>Status</TableHead>
+                                        <TableHead>Detail</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -125,6 +117,19 @@ export default function OfflineList({ auth }: Props) {
                                             </TableCell>
                                             <TableCell>
                                                 {screening.health_check_result}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Link
+                                                    className="text-blue-600"
+                                                    href={route(
+                                                        "paramedis.questioner.detail",
+                                                        {
+                                                            id: screening.id,
+                                                        }
+                                                    )}
+                                                >
+                                                    Detail
+                                                </Link>
                                             </TableCell>
                                         </TableRow>
                                     ))}

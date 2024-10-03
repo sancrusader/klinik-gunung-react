@@ -49,14 +49,14 @@ export default function Header({
                         Offline
                     </NavLink>
                     <NavLink
-                        href={route("paramedis.screening.offline")}
-                        active={route().current("ss")}
+                        href={route("paramedis.screeningOnline")}
+                        active={route().current("paramedis.screeningOnline")}
                     >
                         Online
                     </NavLink>
                     <NavLink
-                        href={route("paramedis.screening.offline")}
-                        active={route().current("sas")}
+                        href={route("community")}
+                        active={route().current("community")}
                     >
                         Community
                     </NavLink>
