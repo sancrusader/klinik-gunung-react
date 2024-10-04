@@ -107,17 +107,7 @@ class ParamedisController extends Controller
             return back()->with('success', 'Data berhasil disimpan');
         }
 
-    public function updateHealthCheck(Request $request, $id)
-    {
-        $request->validate([
-            'health_check_result' => 'required|in:sehat,butuh_pendamping,butuh_dokter',
-        ]);
-        $screening = Offline::findOrFail($id);
-        $screening->health_check_result = $request->health_check_result;
-        $screening->save();
 
-        return redirect()->route('paramedis.screening.offline')->with('success', 'Hasil cek kesehatan berhasil diperbarui.');
-    }
 
     public function processHealthCheck(Request $request, $id)
     {
@@ -198,4 +188,51 @@ class ParamedisController extends Controller
 
         return $path . $filename;
     }
+
+
+    public function PhysicalExamination($id)
+    {
+        // Ambil data dari database berdasarkan id
+        $screening = Offline::findOrFail($id);
+
+        // Kirim data ke halaman Inertia
+        return Inertia::render('Paramedis/PhysicalExamination/Index', [
+            'screening' => $screening
+        ]);
+    }
+
+    public function store(Request $request, $id)
+        {
+            dd($request->all());
+            $validated = $request->validate([
+                'blood_pressure' => 'nullable|string',
+                'heart_rate' => 'nullable|integer',
+                'oxygen_saturation' => 'nullable|integer',
+                'respiratory_rate' => 'nullable|integer',
+                'body_temperature' => 'nullable|numeric',
+                'physical_assessment' => 'nullable|string',
+                'is_recommended_for_hiking' => 'nullable|boolean',
+                'not_recommended_reason' => 'nullable|string',
+                'medical_recommendations' => 'nullable|string',
+            ]);
+
+            // Cari screening berdasarkan ID
+            $screening = Screening::findOrFail($id);
+
+            // Update data pemeriksaan fisik
+            $screening->update([
+                'blood_pressure' => $validated['blood_pressure'],
+                'heart_rate' => $validated['heart_rate'],
+                'oxygen_saturation' => $validated['oxygen_saturation'],
+                'respiratory_rate' => $validated['respiratory_rate'],
+                'body_temperature' => $validated['body_temperature'],
+                'physical_assessment' => $validated['physical_assessment'],
+                'is_recommended_for_hiking' => $validated['is_recommended_for_hiking'],
+                'not_recommended_reason' => $validated['not_recommended_reason'],
+                'medical_recommendations' => $validated['medical_recommendations'],
+            ]);
+
+                return redirect()->route('paramedis.screening.offline');
+        }
+
 }

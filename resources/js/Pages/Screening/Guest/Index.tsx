@@ -21,6 +21,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/Components/ui/select";
+import { Toaster, toast } from "sonner";
 
 interface Screening {
     id: number;
@@ -46,30 +47,28 @@ type FormData = {
     contact_number: string;
     planned_hiking_date: string;
     previous_hikes_count: string;
-    [key: string]: string | string[]; // Ini mengizinkan properti dinamis dengan tipe string[] untuk pertanyaan
+    [key: string]: string | string[];
 };
 
-
-const CombinedScreeningForm: React.FC<{
+export default function Component({ screening, questions, auth }: {
     screening: Screening;
     questions: Questions;
     auth: Auth;
-}> = ({ screening, questions, auth }) => {
+}) {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-const initialData: FormData = {
-    full_name: "",
-    age: "",
-    gender: "",
-    contact_number: "",
-    planned_hiking_date: "",
-    previous_hikes_count: "",
-    // Menambahkan data dinamis untuk questions, yang akan menjadi array string
-    ...Object.keys(questions).reduce(
-        (acc, key) => ({ ...acc, [key]: [] }),
-        {} as { [key: string]: string[] }
-    ),
-};
+    const initialData: FormData = {
+        full_name: "",
+        age: "",
+        gender: "",
+        contact_number: "",
+        planned_hiking_date: "",
+        previous_hikes_count: "",
+        ...Object.keys(questions).reduce(
+            (acc, key) => ({ ...acc, [key]: [] }),
+            {} as { [key: string]: string[] }
+        ),
+    };
 
     const { data, setData, post, processing, errors } =
         useForm<FormData>(initialData);
@@ -103,10 +102,13 @@ const initialData: FormData = {
         e.preventDefault();
         post(route("guest.post"), {
             onSuccess: () => {
-                setSuccessMessage("Screening form submitted successfully!");
+                toast.success(`Screening untuk ${data.full_name} Berhasil Dibuat!`);
+
             },
-            onError: () => {
+            onError: (errors) => {
                 setSuccessMessage(null);
+                toast.error("Failed to submit screening form. Please check the errors and try again.");
+                console.error(errors);
             },
         });
     };
@@ -200,11 +202,12 @@ const initialData: FormData = {
     return (
         <>
             <Head title="Screening Offline" />
+            <Toaster position="top-center"/>
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Combined Screening Form</CardTitle>
+                            <CardTitle>Screening Now</CardTitle>
                             <CardDescription>
                                 Please fill out the form below for your hiking
                                 screening.
@@ -436,6 +439,4 @@ const initialData: FormData = {
             </div>
         </>
     );
-};
-
-export default CombinedScreeningForm;
+}

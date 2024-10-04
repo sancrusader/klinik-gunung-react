@@ -70,7 +70,7 @@ class OfflineController extends Controller
 
     }
 
-    // Menampilkan di pasien
+    // Menampilkan di patient
     public function show()
     {
         $userId = auth()->id();

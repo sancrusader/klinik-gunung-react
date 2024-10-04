@@ -51,7 +51,7 @@ export default function Doctor({
                                         "doctor.OfflineScreening"
                                     )}
                                 >
-                                    Offlin Screening
+                                    Offline Screening
                                 </NavLink>
                             </div>
                         </div>

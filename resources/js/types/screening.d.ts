@@ -19,6 +19,15 @@ export interface Screening {
     experience_knowledge_q3: string;
     experience_knowledge_q4: string;
     experience_knowledge_q5: string;
+    blood_pressure?: string;
+    heart_rate?: number;
+    oxygen_saturation?: number;
+    respiratory_rate?: number;
+    body_temperature?: number;
+    physical_assessment?: string;
+    is_recommended_for_hiking?: boolean;
+    not_recommended_reason?: string;
+    medical_recommendations?: string;
 }
 
 export interface ScreeningOnline {

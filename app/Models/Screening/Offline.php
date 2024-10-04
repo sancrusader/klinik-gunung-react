@@ -13,16 +13,10 @@ class Offline extends Model
     protected $table = 'screening_offlines';
 
     // Kolom yang dapat diisi (mass-assignable)
-    protected $fillable = [
-        'id',
+       protected $fillable = [
         'user_id',
         'full_name',
         'queue_number',
-        'health_check_result',
-        'payment_status',
-        'certificate_issued',
-        'certificate_path',
-        'amount_paid',
         'age',
         'gender',
         'contact_number',
@@ -38,9 +32,22 @@ class Offline extends Model
         'experience_knowledge_q2',
         'experience_knowledge_q3',
         'experience_knowledge_q4',
-        'experience_knowledge_q5'
+        'experience_knowledge_q5',
+        'health_check_result',
+        'payment_status',
+        'amount_paid',
+        'certificate_issued',
+        'certificate_path',
+        'blood_pressure', // Kolom baru
+        'heart_rate', // Kolom baru
+        'oxygen_saturation', // Kolom baru
+        'respiratory_rate', // Kolom baru
+        'body_temperature', // Kolom baru
+        'physical_assessment', // Kolom baru
+        'is_recommended_for_hiking', // Kolom baru
+        'not_recommended_reason', // Kolom baru
+        'medical_recommendations', // Kolom baru
     ];
-
     // Cast atribut ke tipe data tertentu
     protected $casts = [
         'health_check_result' => 'string',

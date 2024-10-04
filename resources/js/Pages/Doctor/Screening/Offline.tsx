@@ -2,6 +2,7 @@ import { PageProps } from "@/types";
 import HealthCheckForm from "@/Components/HealthCheck/HealthCheckForm";
 import PageContainer from "@/Layouts/PageContainer";
 import Header from "@/Layouts/DoctorLayout";
+import { Toaster, toast } from "sonner";
 
 import {
     Table,
@@ -15,7 +16,6 @@ import {
 import { usePage, Head, Link } from "@inertiajs/react";
 import { Screening } from "@/types/screening";
 
-
 interface Props {
     screenings?: Screening[];
 }
@@ -23,10 +23,19 @@ interface Props {
 export default function Offline({ auth }: PageProps) {
     const { screenings = [] } = usePage().props as Props;
 
+    const handleSuccess = (message: string) => {
+        toast.success(message);
+    };
+
+    const handleError = (message: string) => {
+        toast.error(message);
+    };
+
     return (
         <Header user={auth.user}>
             <PageContainer scrollable={true}>
                 <Head title="Screening Offline" />
+                <Toaster position="top-center" closeButton/>
 
                 <Table>
                     <TableCaption>
@@ -34,9 +43,7 @@ export default function Offline({ auth }: PageProps) {
                     </TableCaption>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[100px]">
-                                Antrian
-                            </TableHead>
+                            <TableHead className="w-[100px]">Antrian</TableHead>
                             <TableHead>Nama</TableHead>
                             <TableHead>Umur</TableHead>
                             <TableHead>Jenis Kelamin</TableHead>
@@ -64,44 +71,27 @@ export default function Offline({ auth }: PageProps) {
                                     {screening.previous_hikes_count}
                                 </TableCell>
                                 <TableCell>
-                                    {screening.health_check_result ? (
-                                        <Link
-                                            className="text-blue-600"
-                                            href={route(
-                                                "paramedis.questioner.detail",
-                                                {
-                                                    id: screening.id,
-                                                }
-                                            )}
-                                        >
-                                            Sudah Mengisi
-                                        </Link>
-                                    ) : (
-                                        <Link
-                                            className="text-blue-600"
-                                            href={route(
-                                                "paramedis.questioner",
-                                                {
-                                                    id: screening.id,
-                                                }
-                                            )}
-                                        >
-                                            Questioner
-                                        </Link>
-                                    )}
+                                    <Link
+                                        className="text-blue-600"
+                                        href={route("doctor.screeningDetail", {
+                                            id: screening.id,
+                                        })}
+                                    >
+                                        Questioner
+                                    </Link>
                                 </TableCell>
                                 <TableCell>
-                                    <TableCell>
-                                        {screening.health_check_result ? (
-                                            <span>
-                                                {screening.health_check_result}
-                                            </span>
-                                        ) : (
-                                            <HealthCheckForm
-                                                screening={screening}
-                                            />
-                                        )}
-                                    </TableCell>
+                                    {screening.health_check_result ? (
+                                        <span>
+                                            {screening.health_check_result}
+                                        </span>
+                                    ) : (
+                                        <HealthCheckForm
+                                            screening={screening}
+                                            onSuccess={handleSuccess}
+                                            onError={handleError}
+                                        />
+                                    )}
                                 </TableCell>
                             </TableRow>
                         ))}

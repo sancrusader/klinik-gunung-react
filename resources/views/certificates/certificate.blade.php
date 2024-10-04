@@ -3,9 +3,6 @@
 
 <head>
     <title>Certificate</title>
-    <style>
-        /* Tambahkan gaya CSS yang diinginkan untuk sertifikat */
-    </style>
 </head>
 
 <body>

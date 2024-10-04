@@ -8,7 +8,6 @@ import {
     SelectValue,
 } from "@/Components/ui/select";
 import { Button } from "@/Components/ui/button";
-import { Label } from "@/Components/ui/label";
 
 interface Screening {
     id: number;
@@ -27,7 +26,13 @@ const healthStatusOptions: { value: HealthStatus; label: string }[] = [
     { value: "butuh_dokter", label: "Butuh Dokter" },
 ];
 
-const HealthCheckForm: React.FC<{ screening: Screening }> = ({ screening }) => {
+interface HealthCheckFormProps {
+    screening: Screening;
+    onSuccess?: (message: string) => void;
+    onError?: (message: string) => void;
+}
+
+export default function HealthCheckForm({ screening, onSuccess, onError }: HealthCheckFormProps) {
     const { data, setData, post, processing } = useForm<FormData>({
         health_check_result:
             (screening.health_check_result as HealthStatus) || "",
@@ -35,7 +40,17 @@ const HealthCheckForm: React.FC<{ screening: Screening }> = ({ screening }) => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route("paramedis.healthcheck", screening.id));
+        post(route("health.check.doctor", screening.id), {
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                if (onSuccess) onSuccess("Health check result submitted successfully");
+            },
+            onError: (errors) => {
+                if (onError) onError("Failed to submit health check result");
+                console.error(errors);
+            },
+        });
     };
 
     return (
@@ -73,6 +88,4 @@ const HealthCheckForm: React.FC<{ screening: Screening }> = ({ screening }) => {
             </form>
         </div>
     );
-};
-
-export default HealthCheckForm;
+}

@@ -44,6 +44,7 @@ export default function Offline({ auth }: PageProps) {
                             <TableHead>Planned Hiking Date</TableHead>
                             <TableHead>Previous Hikes</TableHead>
                             <TableHead>Questioner</TableHead>
+                            <TableHead>Pemeriksaan Fisik</TableHead>
                             <TableHead>Status Kesahatan</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -74,6 +75,19 @@ export default function Offline({ auth }: PageProps) {
                                             )}
                                         >
                                             Sudah Mengisi
+                                        </Link>
+                                </TableCell>
+                                <TableCell>
+                                        <Link
+                                            className="text-blue-600"
+                                            href={route(
+                                                "physical.paramedis",
+                                                {
+                                                    id: screening.id,
+                                                }
+                                            )}
+                                        >
+                                            Pemeriksaan Fisik
                                         </Link>
                                 </TableCell>
                                 <TableCell>
