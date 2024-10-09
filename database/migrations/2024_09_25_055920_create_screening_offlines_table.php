@@ -38,18 +38,17 @@ return new class extends Migration
             $table->integer('respiratory_rate')->nullable();
             $table->decimal('body_temperature', 5, 2)->nullable();
             $table->string('physical_assessment')->nullable();
-            $table->boolean('is_recommended_for_hiking')->nullable();
-            $table->text('not_recommended_reason')->nullable();
+            $table->string('is_recommended_for_hiking')->nullable();
             $table->text('medical_recommendations')->nullable();
             $table->string('health_check_result')->nullable();
             $table->boolean('payment_status')->default(false);
             $table->decimal('amount_paid', 10, 2)->nullable();
+            $table->string('payment_method')->nullable();
             $table->boolean('certificate_issued')->default(false);
             $table->string('certificate_path')->nullable();
             $table->timestamps();
         });
     }
-
     /**
      * Reverse the migrations.
      */

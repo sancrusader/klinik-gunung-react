@@ -40,7 +40,7 @@ const timeAgo = (date: string) => {
         return `${interval} minute${interval === 1 ? "" : "s"} ago`;
     return "just now";
 };
-export default function Dashboard({
+export default function Community({
     auth,
     communityPosts,
 }: PageProps<{

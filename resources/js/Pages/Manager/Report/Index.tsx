@@ -1,9 +1,8 @@
 import React from "react";
 import { useForm } from "@inertiajs/react";
 
-// Definisikan tipe data untuk form
 interface ReportFormData {
-    periode: "weekly" | "monthly"; // Tipe data untuk periode
+    periode: "weekly" | "monthly";
 }
 
 const ReportPeriodSelection: React.FC = () => {

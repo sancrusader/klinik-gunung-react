@@ -11,7 +11,7 @@ use App\Http\Requests\Screening\GuestRequest;
 
 class GuestController extends Controller
 {
-
+        // Halaman screening tanpa login
         public function index()
         {
             $questions = $this->getScreeningQuestions();
@@ -53,6 +53,8 @@ class GuestController extends Controller
 
             return back()->with('success', 'Pendaftaran berhasil dan data kuisioner berhasil disimpan, nomor antrian: ' . $queueNumber);
         }
+
+    // Questioner
     private function getScreeningQuestions()
     {
         return [

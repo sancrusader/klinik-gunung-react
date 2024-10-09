@@ -48,8 +48,6 @@ export default function Offline({ auth }: PageProps) {
                             <TableHead>Umur</TableHead>
                             <TableHead>Jenis Kelamin</TableHead>
                             <TableHead>Kontak</TableHead>
-                            <TableHead>Planned Hiking Date</TableHead>
-                            <TableHead>Previous Hikes</TableHead>
                             <TableHead>Questioner</TableHead>
                             <TableHead>Status Health</TableHead>
                         </TableRow>
@@ -64,12 +62,12 @@ export default function Offline({ auth }: PageProps) {
                                 <TableCell>
                                     {screening.contact_number}
                                 </TableCell>
-                                <TableCell>
+                                {/* <TableCell>
                                     {screening.planned_hiking_date}
                                 </TableCell>
                                 <TableCell>
                                     {screening.previous_hikes_count}
-                                </TableCell>
+                                </TableCell> */}
                                 <TableCell>
                                     <Link
                                         className="text-blue-600"
@@ -79,6 +77,19 @@ export default function Offline({ auth }: PageProps) {
                                     >
                                         Questioner
                                     </Link>
+                                </TableCell>
+                                <TableCell>
+                                        <Link
+                                            className="text-blue-600"
+                                            href={route(
+                                                "doctor.physical",
+                                                {
+                                                    id: screening.id,
+                                                }
+                                            )}
+                                        >
+                                            Pemeriksaan Fisik
+                                        </Link>
                                 </TableCell>
                                 <TableCell>
                                     {screening.health_check_result ? (

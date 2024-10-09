@@ -14,17 +14,16 @@ class CommunityController extends Controller
     public function index()
     {
         return Inertia::render('Community/Dashboard', [
-            'communityPosts' => $communityPosts = Community::with('user')->latest()->get(), 
+            'communityPosts' => $communityPosts = Community::with('user')->latest()->get(),
         ]);
     }
-
 
     public function reply(){
         return inertia('Community/Reply');
     }
 
-    public function post(){
-
+    public function post()
+    {
         return Inertia::render('Community/Post', [
             'userId' => $userId = Auth::id(),
     ]);
@@ -35,13 +34,21 @@ class CommunityController extends Controller
         // Validasi input
         $community = Community::create([
         'content' => $request->content,
-        'image_path' => $request->hasFile('image_path') 
-            ? $request->file('image_path')->store('images', 'public') // Simpan gambar di storage/images
+        'image_path' => $request->hasFile('image_path')
+            ? $request->file('image_path')->store('images', 'public')
             : null,
-        'user_id' => Auth::id(), // Ambil ID pengguna yang sedang login
+        'user_id' => Auth::id(),
     ]);
 
     return redirect()->route('community');
+
+    }
+
+    public function Approv(){
+        $community = Community::all();
+        return Inertia::render('Admin/Community/Index',[
+            'communityPosts' => $communityPosts = Community::with('user')->latest()->get(),
+    ]);
 
     }
 }

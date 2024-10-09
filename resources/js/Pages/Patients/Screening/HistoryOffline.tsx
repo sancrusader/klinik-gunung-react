@@ -122,7 +122,7 @@ export default function OfflineList({ auth }: Props) {
                                                 <Link
                                                     className="text-blue-600"
                                                     href={route(
-                                                        "paramedis.questioner.detail",
+                                                        "detail.screening",
                                                         {
                                                             id: screening.id,
                                                         }

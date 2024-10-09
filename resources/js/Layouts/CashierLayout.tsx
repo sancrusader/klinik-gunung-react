@@ -43,7 +43,7 @@ export default function Cashier({
                                         "cashier.screening.offline"
                                     )}
                                 >
-                                    Screening Offline
+                                    Screening
                                 </NavLink>
                             </div>
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
@@ -51,7 +51,7 @@ export default function Cashier({
                                     href={route("cashier.history")}
                                     active={route().current("cashier.history")}
                                 >
-                                    Screening Offline History
+                                    History
                                 </NavLink>
                             </div>
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">

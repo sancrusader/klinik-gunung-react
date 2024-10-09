@@ -57,8 +57,6 @@ Route::middleware(['auth', 'role:manager'])->group(function () {
     Route::get('dashboard/manager/report/pdf', [ManagerController::class, 'generatePDF'])->name('manager.report.pdf');
 });
 
-
-
 // Role Paramedis
 Route::middleware(['auth', 'role:paramedis'])->group(function () {
 
@@ -90,8 +88,10 @@ Route::middleware(['auth', 'role:cashier'])->group(function () {
     Route::get('dashboard/cashier/payment-history', [CashierController::class, 'history'])->name('cashier.history');
     // List Online Screening
     Route::get('dashboard/cashier/screening/online', [OnlineController::class, 'ScreeningOnlinePayment'])->name('cashier.screening.online');
+    // Menampilkan form payment
+    Route::get('dashboard/cashier/screening/payment/{id}', [CashierController::class, 'Payment'])->name('payment.cashier');
     // Confirm Payment Online Screening
-    Route::post('dashboard/cashier/confirm-payment/{id}', [OnlineController::class, 'confirmPayment'])->name('kasir.confirmPayment');
+    Route::post('dashboard/cashier/confirm-payment/{id}', [OnlineController::class, 'confirmPayment'])->name('cashier.confirmPayment');
 });
 
 // Role Patients
@@ -123,6 +123,7 @@ Route::middleware(['auth', 'role:patients'])->group
     Route::get('emergency', [EmergencyController::class, 'create'])->name('emergency');
     Route::get('emergency/history', [EmergencyController::class, 'show'])->name('emergency_show');
     Route::post('emergency/create', [EmergencyController::class, 'store'])->name('emergency_store');
+    Route::get('screening/offline/{id}', [PatientController::class, 'DetailScreeningOffline'])->name('detail.screening');
 });
 
 
@@ -141,6 +142,7 @@ Route::middleware(['auth', 'role:admin'])->group
 
     Route::post('/dashboard/admin/scan/process', [AdminController::class, 'scanQr'])->name('admin.scan.process');
 
+    Route::get('/dashboard/admin/community/list', [CommunityController::class, 'Approv'])->name('admin.community');
 });
 
 Route::get('notification', [ProfileController::class, 'Notif'])->name('notif');
@@ -170,6 +172,8 @@ Route::middleware(['auth', 'role:doctor'])->group
     Route::get('dashboard/doctor/screening/{id}', [DoctorController::class, 'QuestionerDetail'])->name('doctor.screeningDetail');
 
     Route::post('api/screening/health-check/{id}', [DoctorController::class, 'updateHealthCheck'])->name('health.check.doctor');
+
+    Route::get('dashboard/doctor/physical/{id}', [DoctorController::class, 'PhysicalExamination'])->name('doctor.physical');
 });
 
 Route::middleware(['auth', 'role:cordi'])->group
@@ -205,8 +209,6 @@ Route::get('product/list', [EcommerceController::class, 'index'])->name('product
 Route::get('blog', [BlogController::class, 'index'])->name('blogs.index');
 Route::get('blog/new-post', [BlogController::class, 'create'])->name('blog.post');
 Route::post('blog/post', [BlogController::class, 'store'])->name('blog.store');
-
-
 
 // Offline Screening
 Route::get('/screening-now', [GuestController::class, 'index'])->name('screening.guest');

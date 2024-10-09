@@ -67,20 +67,7 @@ class ParamedisController extends Controller
         {
             $screening = Offline::with('user')->findOrFail($id);
 
-            $questions = [
-            'physical_health_q1' => 'Apakah Anda memiliki riwayat penyakit berikut ini?',
-            'physical_health_q2' => 'Kapan terakhir kali Anda Melakukan Pemeriksaan kesehatan umum? ',
-            'physical_health_q3' => 'Apakah Anda memiliki masalah dengan:',
-            'physical_health_q4' => 'Apakah Anda sedang dalam pengobatan rutin atau menggunakan obat tertentu? jika ya, sebutkan:',
-            'physical_health_q5' => 'Bagaimana Anda menilai kondisi fisik Anda saat ini untuk pendakian (misal: kekuatan otot, keseimbangan, stamina)?',
-            'physical_health_q6' => 'Apakah Anda memiliki alergi (terhadap makanan, obat, atau lainnya)? Jika Ya, Sebutkan:',
-            'experience_knowledge_q1' => 'Apakah Anda pernah mendaki Gunung Semeru sebelumnya?',
-            'experience_knowledge_q2' => 'Apakah Anda pernah mengalami Altitude Sickness (mabuk ketinggian)?',
-            'experience_knowledge_q3' => 'Apakah Anda mengetahui cara menangani situasi darurat seperti hipotermia, dehidrasi, atau cedera selama pendakian?',
-            'experience_knowledge_q4' => 'Apakah Anda membawa atau tahu cara menggunakan perlengkapan berikut? (Centang semua yang sesuai)?',
-            'experience_knowledge_q5' => 'Bagaimana persiapan Anda menghadapi perubahan cuaca di Gunung Semeru?',
-            ];
-
+            $questions = $this->getScreeningQuestions();
 
             return Inertia::render('Paramedis/Questioner/QuestionerDetail', [
                 'screening' => $screening,
@@ -203,21 +190,18 @@ class ParamedisController extends Controller
 
     public function store(Request $request, $id)
         {
-            dd($request->all());
             $validated = $request->validate([
                 'blood_pressure' => 'nullable|string',
                 'heart_rate' => 'nullable|integer',
                 'oxygen_saturation' => 'nullable|integer',
                 'respiratory_rate' => 'nullable|integer',
                 'body_temperature' => 'nullable|numeric',
-                'physical_assessment' => 'nullable|string',
-                'is_recommended_for_hiking' => 'nullable|boolean',
-                'not_recommended_reason' => 'nullable|string',
+                'is_recommended_for_hiking' => 'nullable|string',
                 'medical_recommendations' => 'nullable|string',
             ]);
 
             // Cari screening berdasarkan ID
-            $screening = Screening::findOrFail($id);
+            $screening = Offline::findOrFail($id);
 
             // Update data pemeriksaan fisik
             $screening->update([
@@ -226,13 +210,27 @@ class ParamedisController extends Controller
                 'oxygen_saturation' => $validated['oxygen_saturation'],
                 'respiratory_rate' => $validated['respiratory_rate'],
                 'body_temperature' => $validated['body_temperature'],
-                'physical_assessment' => $validated['physical_assessment'],
                 'is_recommended_for_hiking' => $validated['is_recommended_for_hiking'],
-                'not_recommended_reason' => $validated['not_recommended_reason'],
                 'medical_recommendations' => $validated['medical_recommendations'],
             ]);
+            return;
+        }
 
-                return redirect()->route('paramedis.screening.offline');
+        private function getScreeningQuestions()
+        {
+            return [
+                'physical_health_q1' => 'Apakah Anda memiliki riwayat penyakit berikut ini?',
+                'physical_health_q2' => 'Kapan terakhir kali Anda Melakukan Pemeriksaan kesehatan umum?',
+                'physical_health_q3' => 'Apakah Anda memiliki masalah dengan:',
+                'physical_health_q4' => 'Apakah Anda sedang dalam pengobatan rutin atau menggunakan obat tertentu? jika ya, sebutkan:',
+                'physical_health_q5' => 'Bagaimana Anda menilai kondisi fisik Anda saat ini untuk pendakian (misal: kekuatan otot, keseimbangan, stamina)?',
+                'physical_health_q6' => 'Apakah Anda memiliki alergi (terhadap makanan, obat, atau lainnya)? Jika Ya, Sebutkan:',
+                'experience_knowledge_q1' => 'Apakah Anda pernah mendaki Gunung Semeru sebelumnya?',
+                'experience_knowledge_q2' => 'Apakah Anda pernah mengalami Altitude Sickness (mabuk ketinggian)?',
+                'experience_knowledge_q3' => 'Apakah Anda mengetahui cara menangani situasi darurat seperti hipotermia, dehidrasi, atau cedera selama pendakian?',
+                'experience_knowledge_q4' => 'Apakah Anda membawa atau tahu cara menggunakan perlengkapan berikut? (Centang semua yang sesuai)?',
+                'experience_knowledge_q5' => 'Bagaimana persiapan Anda menghadapi perubahan cuaca di Gunung Semeru?',
+            ];
         }
 
 }

@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Models\Screening\Scan;
 use App\Http\Controllers\Controller;
+use App\Models\Community\Community;
 
 class AdminController extends Controller
 {
@@ -47,6 +48,14 @@ class AdminController extends Controller
 
         // Arahkan ke dashboard paramedis
         return redirect()->route('admin.scan');
+    }
+
+    public function Community(){
+
+        $community = Community::all();
+        return Inertia::render('Admin/Community/Index', [
+            
+        ]);
     }
 
 }

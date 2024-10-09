@@ -43,20 +43,7 @@ class DoctorController extends Controller
         {
             $screening = Offline::with('user')->findOrFail($id);
 
-            $questions = [
-            'physical_health_q1' => 'Apakah Anda memiliki riwayat penyakit berikut ini?',
-            'physical_health_q2' => 'Kapan terakhir kali Anda Melakukan Pemeriksaan kesehatan umum? ',
-            'physical_health_q3' => 'Apakah Anda memiliki masalah dengan:',
-            'physical_health_q4' => 'Apakah Anda sedang dalam pengobatan rutin atau menggunakan obat tertentu? jika ya, sebutkan:',
-            'physical_health_q5' => 'Bagaimana Anda menilai kondisi fisik Anda saat ini untuk pendakian (misal: kekuatan otot, keseimbangan, stamina)?',
-            'physical_health_q6' => 'Apakah Anda memiliki alergi (terhadap makanan, obat, atau lainnya)? Jika Ya, Sebutkan:',
-            'experience_knowledge_q1' => 'Apakah Anda pernah mendaki Gunung Semeru sebelumnya?',
-            'experience_knowledge_q2' => 'Apakah Anda pernah mengalami Altitude Sickness (mabuk ketinggian)?',
-            'experience_knowledge_q3' => 'Apakah Anda mengetahui cara menangani situasi darurat seperti hipotermia, dehidrasi, atau cedera selama pendakian?',
-            'experience_knowledge_q4' => 'Apakah Anda membawa atau tahu cara menggunakan perlengkapan berikut? (Centang semua yang sesuai)?',
-            'experience_knowledge_q5' => 'Bagaimana persiapan Anda menghadapi perubahan cuaca di Gunung Semeru?',
-            ];
-
+            $questions = $this->getScreeningQuestions();
 
             return Inertia::render('Doctor/Questioner/Index', [
                 'screening' => $screening,
@@ -64,7 +51,6 @@ class DoctorController extends Controller
             ]);
         }
 
-    // melakukan approve sehat atau tidak
     public function updateHealthCheck(Request $request, $id)
     {
         $request->validate([
@@ -75,5 +61,34 @@ class DoctorController extends Controller
         $screening->save();
 
         return redirect()->route('doctor.OfflineScreening')->with('success', 'Hasil cek kesehatan berhasil diperbarui.');
+    }
+
+    public function PhysicalExamination($id)
+    {
+        // Ambil data dari database berdasarkan id
+        $screening = Offline::findOrFail($id);
+
+        // Kirim data ke halaman Inertia
+        return Inertia::render('Doctor/Questioner/Physical', [
+            'screening' => $screening
+        ]);
+    }
+
+    // Questioner
+    private function getScreeningQuestions()
+    {
+        return [
+            'physical_health_q1' => 'Apakah Anda memiliki riwayat penyakit berikut ini?',
+            'physical_health_q2' => 'Kapan terakhir kali Anda Melakukan Pemeriksaan kesehatan umum?',
+            'physical_health_q3' => 'Apakah Anda memiliki masalah dengan:',
+            'physical_health_q4' => 'Apakah Anda sedang dalam pengobatan rutin atau menggunakan obat tertentu? jika ya, sebutkan:',
+            'physical_health_q5' => 'Bagaimana Anda menilai kondisi fisik Anda saat ini untuk pendakian (misal: kekuatan otot, keseimbangan, stamina)?',
+            'physical_health_q6' => 'Apakah Anda memiliki alergi (terhadap makanan, obat, atau lainnya)? Jika Ya, Sebutkan:',
+            'experience_knowledge_q1' => 'Apakah Anda pernah mendaki Gunung Semeru sebelumnya?',
+            'experience_knowledge_q2' => 'Apakah Anda pernah mengalami Altitude Sickness (mabuk ketinggian)?',
+            'experience_knowledge_q3' => 'Apakah Anda mengetahui cara menangani situasi darurat seperti hipotermia, dehidrasi, atau cedera selama pendakian?',
+            'experience_knowledge_q4' => 'Apakah Anda membawa atau tahu cara menggunakan perlengkapan berikut? (Centang semua yang sesuai)?',
+            'experience_knowledge_q5' => 'Bagaimana persiapan Anda menghadapi perubahan cuaca di Gunung Semeru?',
+        ];
     }
 }

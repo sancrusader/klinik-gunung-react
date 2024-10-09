@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { usePage, router, Link } from "@inertiajs/react";
+import { usePage, router, Link, Head } from "@inertiajs/react";
 import DoctorLayout from "@/Layouts/DoctorLayout";
 import { PageProps } from "@/types";
 import { Button } from "@/Components/ui/button";
@@ -85,6 +85,8 @@ export default function DoctorAppointments({ auth }: Props) {
     };
 
     return (
+        <>
+        <Head title='Appointments'/>
         <DoctorLayout user={auth.user}>
             <div className="container mx-auto py-10">
                 {notification && (
@@ -216,6 +218,7 @@ export default function DoctorAppointments({ auth }: Props) {
                     </CardContent>
                 </Card>
             </div>
-        </DoctorLayout>
+            </DoctorLayout>
+            </>
     );
 }

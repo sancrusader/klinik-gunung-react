@@ -1,5 +1,5 @@
 import React, { FormEvent } from "react";
-import { useForm } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
 import { Input } from "@/Components/ui/input";
 import { Textarea } from "@/Components/ui/textarea";
 import { Button } from "@/Components/ui/button";
@@ -49,7 +49,8 @@ const HealthAssessment: React.FC<{ screening: Screening }> = ({ screening }) => 
   const [recommendationValue, notRecommendedReason] = (data.is_recommended_for_hiking || "").split("|");
 
   return (
-    <>
+      <>
+          <Head title="Kesehatan"/>
       <Toaster position="top-right" />
       <form onSubmit={handleSubmit} className="space-y-6 max-w-xl mx-auto">
         <div>
@@ -61,7 +62,7 @@ const HealthAssessment: React.FC<{ screening: Screening }> = ({ screening }) => 
               onChange={(e) => setData("blood_pressure", e.target.value)}
               placeholder="120/80"
               className="pr-14"
-            />
+            readOnly/>
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
               mmHg
             </span>
@@ -80,7 +81,7 @@ const HealthAssessment: React.FC<{ screening: Screening }> = ({ screening }) => 
               value={data.heart_rate}
               onChange={(e) => setData("heart_rate", e.target.value)}
               className="pr-14"
-            />
+             readOnly/>
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
               BPM
             </span>
@@ -99,7 +100,7 @@ const HealthAssessment: React.FC<{ screening: Screening }> = ({ screening }) => 
               value={data.oxygen_saturation}
               onChange={(e) => setData("oxygen_saturation", e.target.value)}
               className="pr-8"
-            />
+            readOnly/>
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
               %
             </span>
@@ -118,7 +119,7 @@ const HealthAssessment: React.FC<{ screening: Screening }> = ({ screening }) => 
               value={data.respiratory_rate}
               onChange={(e) => setData("respiratory_rate", e.target.value)}
               className="pr-14"
-            />
+            readOnly/>
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
               per menit
             </span>
@@ -138,7 +139,7 @@ const HealthAssessment: React.FC<{ screening: Screening }> = ({ screening }) => 
               value={data.body_temperature}
               onChange={(e) => setData("body_temperature", e.target.value)}
               className="pr-8"
-            />
+            readOnly/>
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
               °C
             </span>
@@ -158,9 +159,9 @@ const HealthAssessment: React.FC<{ screening: Screening }> = ({ screening }) => 
               <SelectValue placeholder="Pilih rekomendasi" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Sangat baik untuk pendakian">Sangat baik untuk pendakian</SelectItem>
-              <SelectItem value="Cukup baik, perlu perhatian khusus">Cukup baik, perlu perhatian khusus</SelectItem>
-              <SelectItem value="Tidak direkomendasikan">Tidak direkomendasikan untuk melakukan pendakian</SelectItem>
+              <SelectItem  value="Sangat baik untuk pendakian"disabled>Sangat baik untuk pendakian</SelectItem>
+              <SelectItem value="Cukup baik, perlu perhatian khusus" disabled>Cukup baik, perlu perhatian khusus</SelectItem>
+              <SelectItem value="Tidak direkomendasikan" disabled>Tidak direkomendasikan untuk melakukan pendakian</SelectItem>
             </SelectContent>
           </Select>
           {errors.is_recommended_for_hiking && (
@@ -177,7 +178,7 @@ const HealthAssessment: React.FC<{ screening: Screening }> = ({ screening }) => 
               onChange={(e) =>
                 setData("is_recommended_for_hiking", `Tidak direkomendasikan|${e.target.value}`)
               }
-            />
+             readOnly/>
           </div>
         )}
 
@@ -187,7 +188,7 @@ const HealthAssessment: React.FC<{ screening: Screening }> = ({ screening }) => 
             id="medical_recommendations"
             value={data.medical_recommendations}
             onChange={(e) => setData("medical_recommendations", e.target.value)}
-          />
+          readOnly/>
           {errors.medical_recommendations && (
             <p className="text-red-500 text-sm mt-1">{errors.medical_recommendations}</p>
           )}
@@ -197,13 +198,9 @@ const HealthAssessment: React.FC<{ screening: Screening }> = ({ screening }) => 
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Perhatian</AlertTitle>
           <AlertDescription>
-            Pastikan semua data yang dimasukkan sudah benar sebelum mengirimkan formulir.
+            Data sudah dimasukan oleh paramedis
           </AlertDescription>
         </Alert>
-
-        <Button type="submit" disabled={processing}>
-          {processing ? "Mengirim..." : "Kirim Penilaian Kesehatan"}
-        </Button>
       </form>
     </>
   );

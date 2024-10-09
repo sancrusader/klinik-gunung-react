@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Http\Requests\Screening\OnlineRequest;
 
 class OnlineController extends Controller
 {
@@ -28,23 +29,8 @@ class OnlineController extends Controller
         return Inertia::render('Screening/Online');
     }
 
-    public function store(Request $request)
+    public function store(OnlineRequest $request)
     {
-        $request->validate([
-            'full_name' => 'required|string|max:255',
-            'date_of_birth' => 'required|date',
-            'mountain' => 'required|string|max:255',
-            'citizenship' => 'required|string|max:255',
-            'country' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'phone' => 'required|string|max:15',
-            'email' => 'required|string|email|max:255',
-            'question1' => 'required|boolean',
-            'question2' => 'required|boolean',
-            'question3' => 'required|boolean',
-            'additional_notes' => 'nullable|string',
-        ]);
-
         $screening = Online::create([
             'user_id' => Auth::id(),
             'full_name' => $request->full_name,
@@ -63,7 +49,7 @@ class OnlineController extends Controller
             'queue_number' => $this->generateQueueNumber(),
         ]);
 
-       return redirect()->route('screenings.payment', $screening->id);
+       return;
     }
 
     public function payment($id)

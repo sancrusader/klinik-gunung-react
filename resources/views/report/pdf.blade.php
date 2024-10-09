@@ -50,6 +50,7 @@
                 <th>Tanggal Screening</th>
                 <th>Status</th>
                 <th>Jumlah Dibayar</th>
+                <th>Metode Pembayaran</th>
             </tr>
         </thead>
         <tbody>
@@ -60,6 +61,7 @@
                     <td>{{ $screening->created_at->format('d-m-Y') }}</td> <!-- Sesuaikan dengan format tanggal -->
                     <td>{{ $screening->health_check_result }}</td> <!-- Sesuaikan dengan field hasil pemeriksaan -->
                     <td>Rp {{ number_format($screening->amount_paid, 0, ',', '.') }}</td>
+                    <td>{{ $screening->payment_method }}</td>
                     <!-- Sesuaikan dengan field jumlah dibayar -->
                 </tr>
             @endforeach

@@ -1,7 +1,5 @@
-import React from "react";
 import { PageProps } from "@/types";
 import CashierLayout from "@/Layouts/CashierLayout";
-import PaymentForm from "@/Components/PaymentForm";
 import {
     Table,
     TableBody,
@@ -11,7 +9,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/Components/ui/table";
-import { usePage, Head } from "@inertiajs/react";
+import { usePage, Head, Link } from "@inertiajs/react";
 
 interface Screening {
     id: number;
@@ -53,18 +51,17 @@ export default function Payment({ auth }: PageProps) {
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead className="w-[100px]">
-                                            Queue Number
+                                            Antrian
                                         </TableHead>
-                                        <TableHead>Full Name</TableHead>
-                                        <TableHead>Age</TableHead>
-                                        <TableHead>Gender</TableHead>
-                                        <TableHead>Contact Number</TableHead>
+                                        <TableHead>Nama</TableHead>
+                                        <TableHead>Umur</TableHead>
+                                        <TableHead>Jenis Kelamin</TableHead>
+                                        <TableHead>Kontak</TableHead>
                                         <TableHead>
                                             Planned Hiking Date
                                         </TableHead>
                                         <TableHead>Previous Hikes</TableHead>
-                                        <TableHead>Amount Paid</TableHead>
-                                        <TableHead>Confirm Payment</TableHead>
+                                        <TableHead>Pembayaran</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -92,9 +89,13 @@ export default function Payment({ auth }: PageProps) {
                                                 {screening.previous_hikes_count}
                                             </TableCell>
                                             <TableCell>
-                                                <PaymentForm
-                                                    screening={screening}
-                                                />
+                                            {screening.payment_status ? (
+                                                <span>Sudah Bayar</span>
+                                            ) : (
+                                                <Link href={route('payment.cashier', screening.id)} className="text-blue-500">
+                                                    Belum Bayar
+                                                </Link>
+                                            )}
                                             </TableCell>
                                         </TableRow>
                                     ))}
