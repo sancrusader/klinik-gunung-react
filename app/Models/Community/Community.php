@@ -14,6 +14,7 @@ class Community extends Model
         'user_id',
         'content',
         'image_path',
+        'statuts',
     ];
 
     public function user()
@@ -21,5 +22,5 @@ class Community extends Model
         return $this->belongsTo(User::class);
     }
 
-    
+
 }

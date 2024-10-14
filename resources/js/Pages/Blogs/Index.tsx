@@ -1,9 +1,10 @@
-import { Head } from "@inertiajs/react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import { Link } from "@inertiajs/react";
-import { PageProps } from "@/types"; // Pastikan jalur ini benar
+import { Link,Head } from "@inertiajs/react";
+import { Sheet, SheetTrigger, SheetContent } from "@/Components/ui/sheet";
+import { Button } from "@/Components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/Components/ui/avatar";
+import Header from "@/Layouts/Header";
+import { PageProps } from "@/types";
 
-// Definisi tipe Blog
 export interface Blog {
     id: number;
     title: string;
@@ -13,47 +14,60 @@ export interface Blog {
     updated_at: string;
 }
 
-// Definisi Props untuk komponen Index
 interface Props extends PageProps {
-    blogs: Blog[]; // Pastikan untuk mendefinisikan tipe untuk blogs
+    blogs: Blog[];
 }
 
 export default function Index({ blogs }: Props) {
     return (
-        <>
-            <Head title="Blogs" />
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <Link
-                        href="/blogs/create"
-                        className="mb-4 inline-block bg-blue-500 text-white py-2 px-4 rounded"
-                    >
-                        Create New Blog
-                    </Link>
-                    {/* Cek apakah blogs tidak kosong sebelum mapping */}
-                    {blogs.length > 0 ? (
-                        blogs.map((blog: Blog) => (
-                            <Card key={blog.id} className="mb-4">
-                                <CardHeader>
-                                    <CardTitle>{blog.title}</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    {blog.image_path && (
-                                        <img
-                                            src={`/storage/${blog.image_path}`}
-                                            alt={blog.title}
-                                            className="mb-4"
-                                        />
-                                    )}
-                                    <p>{blog.content}</p>
-                                </CardContent>
-                            </Card>
-                        ))
-                    ) : (
-                        <p>No blogs found.</p> // Pesan jika tidak ada blog
-                    )}
-                </div>
-            </div>
-        </>
+        <Header>
+            <Head title="Blog"/>
+            <main className="flex-1">
+                <section className="py-12 md:py-16 lg:py-20">
+                    <div className="container px-4 md:px-6">
+                        <div className="space-y-6 md:space-y-8">
+                            <div className="space-y-2">
+                                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Blog</h2>
+                                <p className="text-muted-foreground">Check out the latest articles from our blog.</p>
+                            </div>
+                            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                {blogs.length > 0 ? (
+                                    blogs.map((blog: Blog) => (
+                                        <Link
+                                            key={blog.id}
+                                            href={`/blogs/${blog.id}`}
+                                            className="group grid h-auto w-full justify-start gap-4 rounded-lg bg-background p-4 transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                                        >
+                                            <div className="aspect-video overflow-hidden rounded-lg">
+                                                <img
+                                                    src={blog.image_path || "/placeholder.svg"}
+                                                    width={400}
+                                                    height={225}
+                                                    alt={blog.title}
+                                                    className="h-full w-full object-cover transition-all group-hover:scale-105"
+                                                    style={{ aspectRatio: "400/225", objectFit: "cover" }}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <h3 className="text-lg font-semibold leading-tight group-hover:underline">
+                                                    {blog.title}
+                                                </h3>
+                                                <p className="line-clamp-2 text-muted-foreground">
+                                                    {blog.content.length > 100
+                                                        ? `${blog.content.substring(0, 100)}...`
+                                                        : blog.content}
+                                                </p>
+                                            </div>
+                                        </Link>
+                                    ))
+                                ) : (
+                                    <p>No blogs available.</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </Header>
     );
 }

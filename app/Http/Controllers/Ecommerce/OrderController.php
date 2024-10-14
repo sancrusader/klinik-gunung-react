@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Ecommerce;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Ecommerce\Order;
+use App\Models\Ecommerce\Product;
+use App\Models\Ecommerce\OrderItem;
+use App\Http\Controllers\Controller;
 
 class OrderController extends Controller
 {

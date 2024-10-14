@@ -21,7 +21,7 @@ class ProfileController extends Controller
         return Inertia::render('Notification/Notif');
     }
 
-    
+
     public function edit(Request $request): Response
     {
         return Inertia::render('Profile/Edit', [
@@ -35,8 +35,18 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $validatedData = $request->validated();
 
+        // Jika ada file avatar dalam request
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $validatedData['avatar'] = $path;
+        }
+
+        // Update data user
+        $request->user()->fill($validatedData);
+
+        // Reset verifikasi email jika email berubah
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
@@ -45,6 +55,7 @@ class ProfileController extends Controller
 
         return Redirect::route('profile.edit');
     }
+
 
     /**
      * Delete the user's account.

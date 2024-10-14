@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Blog;
 
+use App\Models\User;
 use Inertia\Inertia;
 use App\Models\Blog\Blog;
 use Illuminate\Http\Request;
@@ -12,7 +13,6 @@ class BlogController extends Controller
     public function index()
     {
         $blogs = Blog::all();
-
         return Inertia::render('Blogs/Index', [
             'blogs' => $blogs,
         ]);

@@ -9,6 +9,7 @@ use App\Http\Controllers\Blog\BlogController;
 use App\Http\Controllers\user\AdminController;
 use App\Http\Controllers\User\CordiController;
 use App\Http\Controllers\User\DoctorController;
+use App\Http\Controllers\Page\ContactController;
 use App\Http\Controllers\User\CashierController;
 use App\Http\Controllers\User\ManagerController;
 use App\Http\Controllers\User\PatientController;
@@ -23,7 +24,7 @@ use App\Http\Controllers\Screening\OfflineController;
 use App\Http\Controllers\Clinic\AppointmentController;
 use App\Http\Controllers\Ecommerce\CategoryController;
 use App\Http\Controllers\Community\CommunityController;
-
+use App\Http\Controllers\Community\ProfileCommunityController;
 
 //Home
 Route::get('/', function () {
@@ -132,17 +133,30 @@ Route::middleware('auth')->group(function () {
     Route::get('community/reply', [CommunityController::class, 'reply'])->name('community.reply');
     Route::get('community/post', [CommunityController::class, 'post'])->name('community.post');
     Route::post('/community', [CommunityController::class, 'store'])->name('community.store');
+    Route::get('/community/profile/{hash}', [ProfileCommunityController::class, 'Index'])->name('community.profile');
+
+    Route::get('/cart', [ProductController::class, 'showCart'])->name('cart');
 });
 
 Route::middleware(['auth', 'role:admin'])->group
 (function () {
     Route::get('/dashboard/admin', [AdminController::class, 'index'])->name('admin.dashboard');
-
+    // Scan
     Route::get('/dashboard/admin/scan', [AdminController::class, 'scan'])->name('admin.scan');
-
     Route::post('/dashboard/admin/scan/process', [AdminController::class, 'scanQr'])->name('admin.scan.process');
-
+    // Community
     Route::get('/dashboard/admin/community/list', [CommunityController::class, 'Approv'])->name('admin.community');
+    Route::post('/communities/{id}/approve', [CommunityController::class, 'approve'])->name('community.approve');
+    // Product
+    Route::get('product/new', [ProductController::class, 'create'])->name('product.create');
+    Route::post('/products/post', [ProductController::class, 'store'])->name('products.store');
+    Route::get('product/category', [CategoryController::class, 'create'])->name('category.create');
+    Route::post('product/category/post', [CategoryController::class, 'store'])->name('category.store');
+    Route::get('product/list', [EcommerceController::class, 'index'])->name('product.list');
+    // Blog
+    Route::get('blog/new-post', [BlogController::class, 'create'])->name('blog.post');
+    Route::post('blog/post', [BlogController::class, 'store'])->name('blog.store');
+
 });
 
 Route::get('notification', [ProfileController::class, 'Notif'])->name('notif');
@@ -188,27 +202,22 @@ Route::middleware(['auth', 'role:cordi'])->group
 
 });
 
-
+// Profile
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-
-// ecommerce
+// Product
 Route::get('product', [ProductController::class, 'index'])->name('product');
-// Membuat Product Baru
-Route::get('product/new', [ProductController::class, 'create'])->name('product.create');
-Route::post('/products/post', [ProductController::class, 'store'])->name('products.store');
+Route::post('/product/cart/{id}', [ProductController::class, 'addToCart'])->name('cart');
 
-// List Product For Admin or
-Route::get('product/list', [EcommerceController::class, 'index'])->name('product.list');
 
 // Blog
 Route::get('blog', [BlogController::class, 'index'])->name('blogs.index');
-Route::get('blog/new-post', [BlogController::class, 'create'])->name('blog.post');
-Route::post('blog/post', [BlogController::class, 'store'])->name('blog.store');
+// Contact
+Route::get('contact', [ContactController::class, 'Index'])->name('contact');
 
 // Offline Screening
 Route::get('/screening-now', [GuestController::class, 'index'])->name('screening.guest');

@@ -4,7 +4,7 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import { Link, useForm, usePage } from "@inertiajs/react";
 import { Transition } from "@headlessui/react";
-import { FormEventHandler, useEffect } from "react";
+import { FormEventHandler } from "react";
 import { PageProps } from "@/types";
 import { Avatar, AvatarImage, AvatarFallback } from "@/Components/ui/avatar";
 import { Input } from "@/Components/ui/input";
@@ -20,31 +20,29 @@ export default function UpdateProfileInformation({
 }) {
     const user = usePage<PageProps>().props.auth.user;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } =
-        useForm({
-            name: user.name,
-            email: user.email,
-            avatar: null as File | null, // Tambahkan ini untuk menyimpan gambar avatar
-        });
+    const { data, setData, post, processing, errors, recentlySuccessful } = useForm({
+        name: user.name,
+        email: user.email,
+        avatar: null as File | null,
+    });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        patch(route("profile.update"), {
-            data: {
-                name: data.name,
-                email: data.email,
-                avatar: data.avatar, // Sertakan avatar dalam data yang dikirim
-            },
+        const formData = new FormData();
+        formData.append('name', data.name);
+        formData.append('email', data.email);
+        if (data.avatar) {
+            formData.append('avatar', data.avatar);
+        }
+
+        post(route("profile.update"), {
+            data: formData,
+            preserveState: false,
+            preserveScroll: true,
+            forceFormData: true,
         });
     };
-
-    // Update avatar state when user object changes
-    // useEffect(() => {
-    //     if (user.avatar) {
-    //         setData("avatar", user.avatar);
-    //     }
-    // }, [user.avatar]);
 
     return (
         <section className={className}>
@@ -52,7 +50,6 @@ export default function UpdateProfileInformation({
                 <h2 className="text-lg font-medium text-gray-900">
                     Profile Information
                 </h2>
-
                 <p className="mt-1 text-sm text-gray-600">
                     Update your account's profile information and email address.
                 </p>
@@ -64,41 +61,47 @@ export default function UpdateProfileInformation({
                         <Avatar className="h-16 w-16">
                             {data.avatar ? (
                                 <AvatarImage
-                                    src={URL.createObjectURL(data.avatar)} // Tampilkan gambar yang di-upload
+                                    src={URL.createObjectURL(data.avatar)}
+
+                                    alt="User avatar"
+                                />
+                            ) : user.avatar ? (
+                                <AvatarImage
+                                    src={`/storage/${user.avatar}`}
                                     alt="User avatar"
                                 />
                             ) : (
-                                <AvatarFallback>?</AvatarFallback>
+                                <AvatarFallback>
+                                    {user.name.charAt(0).toUpperCase()}
+                                </AvatarFallback>
                             )}
                         </Avatar>
                         <Input
                             id="avatar"
                             type="file"
+                            accept="image/*"
                             onChange={(e) => {
-                                if (e.target.files) {
-                                    setData("avatar", e.target.files[0]); // Simpan file gambar
+                                if (e.target.files && e.target.files[0]) {
+                                    setData("avatar", e.target.files[0]);
                                 }
                             }}
                         />
                     </div>
                     <InputLabel htmlFor="name" value="Name" />
-
                     <TextInput
                         id="name"
                         className="mt-1 block w-full"
                         value={data.name}
-                        onChange={(e) => setData("name", e.target.value)}
+                        onChange={(e) => setData('name', e.target.value)}
                         required
                         isFocused
                         autoComplete="name"
                     />
-
-                    <InputError className="mt-2" message={errors.name} />
+                    <InputError message={errors.name} className="mt-2" />
                 </div>
 
                 <div>
                     <InputLabel htmlFor="email" value="Email" />
-
                     <TextInput
                         id="email"
                         type="email"
@@ -106,10 +109,9 @@ export default function UpdateProfileInformation({
                         value={data.email}
                         onChange={(e) => setData("email", e.target.value)}
                         required
-                        autoComplete="username"
+                        autoComplete="email"
                     />
-
-                    <InputError className="mt-2" message={errors.email} />
+                    <InputError message={errors.email} className="mt-2" />
                 </div>
 
                 {mustVerifyEmail && user.email_verified_at === null && (
@@ -125,11 +127,9 @@ export default function UpdateProfileInformation({
                                 Click here to re-send the verification email.
                             </Link>
                         </p>
-
                         {status === "verification-link-sent" && (
                             <div className="mt-2 font-medium text-sm text-green-600">
-                                A new verification link has been sent to your
-                                email address.
+                                A new verification link has been sent to your email address.
                             </div>
                         )}
                     </div>
@@ -137,7 +137,6 @@ export default function UpdateProfileInformation({
 
                 <div className="flex items-center gap-4">
                     <PrimaryButton disabled={processing}>Save</PrimaryButton>
-
                     <Transition
                         show={recentlySuccessful}
                         enter="transition ease-in-out"

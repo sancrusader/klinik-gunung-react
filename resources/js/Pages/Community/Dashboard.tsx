@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Textarea } from "@/Components/ui/textarea";
-import { Head } from "@inertiajs/react";
+import { Head,Link } from "@inertiajs/react";
 import { PageProps } from "@/types";
 
 import {
@@ -43,11 +43,13 @@ const timeAgo = (date: string) => {
 export default function Community({
     auth,
     communityPosts,
+    hashedId,
 }: PageProps<{
+    hashedId: string,
     communityPosts?: {
         id: number;
         content: string;
-        user: { name: string; avatar_url?: string };
+        user: { name: string; avatar?: string };
         created_at: string;
     }[];
 }>) {
@@ -100,7 +102,7 @@ export default function Community({
                             >
                                 <div className="flex items-center space-x-3 mb-4">
                                     <Avatar>
-                                        <AvatarImage src="" />
+                                        <AvatarImage src={`/storage/${post.user.avatar}`} />
                                         <AvatarFallback></AvatarFallback>
                                     </Avatar>
                                     <div>
@@ -181,13 +183,11 @@ export default function Community({
                         >
                             <Heart className="w-6 h-6" />
                         </Button>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-gray-400 "
-                        >
-                            <User className="w-6 h-6" />
-                        </Button>
+                        <Link href={`/profile/${hashedId}`}>
+                            <Button variant="ghost" size="icon" className="text-gray-400">
+                                <User className="w-6 h-6" />
+                            </Button>
+                        </Link>
                     </div>
                 </nav>
             </div>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Ecommerce;
 
+use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Models\Ecommerce\Category;
 use App\Http\Controllers\Controller;
@@ -10,17 +11,15 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::paginate(10); // Mengambil 10 kategori per halaman
+        $categories = Category::paginate(10);
         return view('admin.categories.index', compact('categories'));
     }
 
-    // Menampilkan form untuk membuat kategori baru
     public function create()
     {
-        return view('admin.categories.create');
+        return Inertia::render('Ecommerce/Product/Category');
     }
 
-    // Menyimpan kategori baru ke database
     public function store(Request $request)
     {
         $request->validate([
@@ -31,10 +30,10 @@ class CategoryController extends Controller
             'name' => $request->name,
         ]);
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category created successfully!');
+        return;
     }
 
-    // Menampilkan form untuk mengedit kategori
+
     public function edit($id)
     {
         $category = Category::findOrFail($id);

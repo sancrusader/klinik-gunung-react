@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { useForm } from "@inertiajs/react";
+import { useForm, Head } from "@inertiajs/react";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Textarea } from "@/Components/ui/textarea";
 import { Select } from "@/Components/ui/select";
+import {Toaster, toast} from "sonner";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 
@@ -20,14 +21,24 @@ export default function CreateProduct({
         category_id: "",
         image: null as File | null,
     });
-
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route("products.store")); // Adjust the route based on your setup
-    };
-
+        post(route("products.store"),{
+        onSuccess: () => {
+            toast.success('Produk berhasil dibuat');
+        },
+        onError: (errors) => {
+            setSuccessMessage(null);
+            toast.error("Failed to submit produk form. Please check the errors and try again.");
+            console.error(errors);
+        },
+ });
+}
     return (
         <section className="py-12">
+            <Head title="Create Product"/>
+            <Toaster position="top-center"/>
             <div className="max-w-2xl mx-auto sm:px-6 lg:px-8">
                 <Card>
                     <CardHeader>

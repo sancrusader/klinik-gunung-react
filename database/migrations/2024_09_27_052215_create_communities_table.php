@@ -11,7 +11,8 @@ class CreatecommunitiesTable extends Migration
         Schema::create('communities', function (Blueprint $table) {
             $table->id();
             $table->text('content')->nullable();
-             $table->string('image_path')->nullable();
+            $table->string('image_path')->nullable();
+            $table->string('status')->default('pending');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
@@ -22,4 +23,3 @@ class CreatecommunitiesTable extends Migration
         Schema::dropIfExists('communities');
     }
 }
-

@@ -4,29 +4,34 @@ namespace App\Http\Controllers\Ecommerce;
 
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use App\Models\Ecommerce\Cart;
+use App\Models\Ecommerce\Order;
 use App\Models\Ecommerce\Product;
 use App\Models\Ecommerce\Category;
+use App\Models\Ecommerce\OrderItem;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
     public function index(Request $request)
-        {
-            $products = Product::all();
-            return Inertia::render('Ecommerce/Index', [
-                'products' => $products,
-            ]);
-        }
+    {
+        $products = Product::all();
+        return Inertia::render('Ecommerce/Index', [
+            'products' => $products,
+        ]);
+    }
 
-        public function create(){
-            return Inertia::render('Ecommerce/Product/Create',[
-                'categories'=>$categories = Category::all(),
-            ]);
-        }
+    public function create()
+    {
+        return Inertia::render('Ecommerce/Product/Create', [
+            'categories' => $categories = Category::all(),
+        ]);
+    }
 
-        // Membuat Product Baru
-        public function store(Request $request)
-        {
+    // Membuat Product Baru
+    public function store(Request $request)
+    {
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -51,7 +56,6 @@ class ProductController extends Controller
         return redirect()->route('product')->with('success', 'Product created successfully!');
     }
 
-        // Menampilkan form untuk mengedit produk
     public function edit($id)
     {
         $product = Product::findOrFail($id);
@@ -97,55 +101,70 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully!');
     }
 
+
     public function addToCart(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-        $cart = session()->get('cart', []);
+        $user = Auth::user();
 
-        if (isset($cart[$id])) {
-            $cart[$id]['quantity']++;
+        // Cek jika produk sudah ada di cart user
+        $cartItem = Cart::where('user_id', $user->id)
+            ->where('product_id', $product->id)
+            ->first();
+
+        if ($cartItem) {
+            // Update quantity jika produk sudah ada di cart
+            $cartItem->quantity += 1;
+            $cartItem->save();
         } else {
-            $cart[$id] = [
-                "name" => $product->name,
-                "quantity" => 1,
-                "price" => $product->price,
-                "image" => $product->image_path
-            ];
+            // Tambahkan produk baru ke cart
+            Cart::create([
+                'user_id' => $user->id,
+                'product_id' => $product->id,
+                'quantity' => 1,
+            ]);
         }
-
-        session()->put('cart', $cart);
 
         return redirect()->back()->with('success', 'Product added to cart successfully!');
     }
 
-    public function checkout(Request $request)
-{
-    $request->validate([
-        'total_amount' => 'required|numeric',
-        // Tambahkan validasi lain sesuai kebutuhan
-    ]);
 
-    $order = Order::create([
-        'user_id' => auth()->id(),
-        'total_amount' => $request->total_amount,
-        'status' => 'pending',
-    ]);
+    public function showCart()
+    {
+        $user = Auth::user();
 
-    $cart = session()->get('cart');
+        // Ambil item cart yang sesuai dengan user yang login
+        $cartItems = Cart::with('product')->where('user_id', $user->id)->get();
 
-    foreach ($cart as $id => $details) {
-        OrderItem::create([
-            'order_id' => $order->id,
-            'product_id' => $id,
-            'quantity' => $details['quantity'],
-            'price' => $details['price'],
-        ]);
+        return inertia('Ecommerce/Cart', ['cartItems' => $cartItems]);
     }
 
-    session()->forget('cart');
+    public function checkout(Request $request)
+    {
+        $request->validate([
+            'total_amount' => 'required|numeric',
+            // Tambahkan validasi lain sesuai kebutuhan
+        ]);
 
-    return redirect()->route('orders.index')->with('success', 'Order placed successfully!');
-}
+        $order = Order::create([
+            'user_id' => auth()->id(),
+            'total_amount' => $request->total_amount,
+            'status' => 'pending',
+        ]);
 
+        $cart = session()->get('cart');
 
+        foreach ($cart as $id => $details) {
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $id,
+                'quantity' => $details['quantity'],
+                'price' => $details['price'],
+            ]);
+        }
+
+        session()->forget('cart');
+
+        return redirect()->route('orders.index')->with('success', 'Order placed successfully!');
+    }
 }

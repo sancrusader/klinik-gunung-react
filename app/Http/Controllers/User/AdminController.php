@@ -54,7 +54,7 @@ class AdminController extends Controller
 
         $community = Community::all();
         return Inertia::render('Admin/Community/Index', [
-            
+
         ]);
     }
 

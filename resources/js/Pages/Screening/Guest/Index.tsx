@@ -22,6 +22,7 @@ import {
     SelectValue,
 } from "@/Components/ui/select";
 import { Toaster, toast } from "sonner";
+import Header from "@/Layouts/Header";
 
 interface Screening {
     id: number;
@@ -200,7 +201,7 @@ export default function Component({ screening, questions, auth }: {
     );
 
     return (
-        <>
+        <Header>
             <Head title="Screening Offline" />
             <Toaster position="top-center"/>
             <div className="py-12">
@@ -437,6 +438,6 @@ export default function Component({ screening, questions, auth }: {
                     </Card>
                 </div>
             </div>
-        </>
+            </Header>
     );
 }
