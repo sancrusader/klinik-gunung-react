@@ -5,7 +5,7 @@ import { Button } from "@/Components/ui/button"
 import Header from "@/Layouts/Header"
 import { Head } from "@inertiajs/react"
 
-export default function Component() {
+export default function Contact() {
   return (
     <Header>
         <Head title="Contact"/>

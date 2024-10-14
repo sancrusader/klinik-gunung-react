@@ -43,13 +43,13 @@ const timeAgo = (date: string) => {
 export default function Community({
     auth,
     communityPosts,
-    hashedId,
+    userid,
 }: PageProps<{
-    hashedId: string,
+    userid: number,
     communityPosts?: {
         id: number;
         content: string;
-        user: { name: string; avatar?: string };
+        user: { name: string; avatar?: string, uuid:number, };
         created_at: string;
     }[];
 }>) {
@@ -183,7 +183,7 @@ export default function Community({
                         >
                             <Heart className="w-6 h-6" />
                         </Button>
-                        <Link href={`/profile/${hashedId}`}>
+                        <Link href={`/community/profile/${userid}`}>
                             <Button variant="ghost" size="icon" className="text-gray-400">
                                 <User className="w-6 h-6" />
                             </Button>

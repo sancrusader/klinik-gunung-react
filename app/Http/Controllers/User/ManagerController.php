@@ -7,11 +7,14 @@ use Dompdf\Options;
 use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use App\Models\StaffSchedule;
 use Illuminate\Support\Carbon;
 use App\Models\Screening\Online;
 use App\Models\Screening\Offline;
 use App\Http\Controllers\Controller;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
+use Illuminate\Support\Facades\Storage;
+use SebastianBergmann\CodeCoverage\Report\Xml\Report;
 
 class ManagerController extends Controller
 {
@@ -72,31 +75,6 @@ class ManagerController extends Controller
         $totalPatients = User::where('role', 'patient')->count();
 
         return inertia('Manager/Dashboard');
-    }
-
-    public function showScheduleForm()
-    {
-        $staff = User::all(); // Ambil semua staf
-        return view('dashboard.manajer.schedule_form', compact('staff'));
-    }
-
-    public function storeSchedule(Request $request)
-    {
-        $request->validate([
-            'staff_id' => 'required|exists:users,id',
-            'shift' => 'required|string',
-            'schedule_date' => 'required|date',
-            'role' => 'required|string', // Role harus diisi
-        ]);
-
-        StaffSchedule::create([
-            'staff_id' => $request->staff_id,
-            'shift' => $request->shift,
-            'schedule_date' => $request->schedule_date,
-            'role' => $request->role,
-        ]);
-
-        return redirect()->route('dashboard.manajer.schedule.form')->with('success', 'Shift telah berhasil diatur.');
     }
 
     public function generateReport(Request $request)
@@ -226,5 +204,33 @@ class ManagerController extends Controller
 
     public function reportManager(){
         return inertia('Manager/Report/Index');
+    }
+
+
+    public function Shift(){
+        $staff = User::whereIn('role', ['paramedis', 'doctor', 'admin', 'cashier'])->get();
+        return inertia('Manager/Shift/Index', [
+            'staff' => $staff,
+        ]);
+    }
+
+    public function storeSchedule(Request $request)
+    {
+
+        $request->validate([
+            'staff_id' => 'required|exists:users,id',
+            'shift' => 'required|string',
+            'schedule_date' => 'required|date',
+            'role' => 'required|string',
+        ]);
+
+        StaffSchedule::create([
+            'staff_id' => $request->staff_id,
+            'shift' => $request->shift,
+            'schedule_date' => $request->schedule_date,
+            'role' => $request->role,
+        ]);
+
+        return;
     }
 }

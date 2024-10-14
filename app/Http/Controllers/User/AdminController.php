@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\user;
 
+use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Models\Screening\Scan;
-use App\Http\Controllers\Controller;
 use App\Models\Community\Community;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Validator;
 
 class AdminController extends Controller
 {
@@ -20,7 +23,6 @@ class AdminController extends Controller
 
     public function scanQr(Request $request)
     {
-        // Validasi input
         $request->validate([
             'qr_code_data' => 'required|string',
         ]);
@@ -56,6 +58,35 @@ class AdminController extends Controller
         return Inertia::render('Admin/Community/Index', [
 
         ]);
+    }
+
+    public function Users()
+    {
+        return Inertia::render('Admin/Users/Index');
+    }
+
+    public function addUsers(){
+        return Inertia::render('Admin/Users/Create');
+    }
+
+    public function storeUser(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+            'role' => 'required|string|in:admin,cashier,paramedis,doctor,manager,cordi',
+        ]);
+
+        //
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $request->role,
+        ]);
+
+        return redirect()->back()->with('success', 'User added successfully.');
     }
 
 }

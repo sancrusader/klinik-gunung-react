@@ -56,6 +56,8 @@ Route::middleware(['auth', 'role:manager'])->group(function () {
     Route::get('/dashboard/manager', [ManagerController::class, 'index'])->name('manager.dashboard');
     Route::get('/dashboard/manager/report', [ManagerController::class, 'reportManager'])->name('report.manager');
     Route::get('dashboard/manager/report/pdf', [ManagerController::class, 'generatePDF'])->name('manager.report.pdf');
+    Route::get('dashboard/manager/shiff', [ManagerController::class, 'Shift'])->name('manager.shiff');
+    Route::post('api/shiff-schedule', [ManagerController::class, 'storeSchedule'])->name('manager.staff.store');
 });
 
 // Role Paramedis
@@ -133,7 +135,7 @@ Route::middleware('auth')->group(function () {
     Route::get('community/reply', [CommunityController::class, 'reply'])->name('community.reply');
     Route::get('community/post', [CommunityController::class, 'post'])->name('community.post');
     Route::post('/community', [CommunityController::class, 'store'])->name('community.store');
-    Route::get('/community/profile/{hash}', [ProfileCommunityController::class, 'Index'])->name('community.profile');
+    Route::get('/community/profile/{uuid}', [ProfileCommunityController::class, 'Index'])->name('community.profile');
 
     Route::get('/cart', [ProductController::class, 'showCart'])->name('cart');
 });
@@ -156,6 +158,9 @@ Route::middleware(['auth', 'role:admin'])->group
     // Blog
     Route::get('blog/new-post', [BlogController::class, 'create'])->name('blog.post');
     Route::post('blog/post', [BlogController::class, 'store'])->name('blog.store');
+    Route::get('dashboard/admin/users', [AdminController::class, 'Users'])->name('users.admin');
+    Route::get('dashboard/admin/users/new', [AdminController::class, 'addUsers'])->name('users.new');
+    Route::post('dashboard/admin/users/new', [AdminController::class, 'storeUser'])->name('users.store');
 
 });
 

@@ -44,6 +44,14 @@ export default function Admin({
                             </div>
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink
+                                    href={route("users.new")}
+                                    active={route().current("users.new")}
+                                >
+                                    Users
+                                </NavLink>
+                            </div>
+                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                                <NavLink
                                     href={route("product.list")}
                                     active={route().current("product.list")}
                                 >

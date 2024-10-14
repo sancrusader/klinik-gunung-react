@@ -10,10 +10,9 @@ use Veelasky\LaravelHashId\Eloquent\HashableId;
 
 class ProfileCommunityController extends Controller
 {
-    public function Index($hash){
-        $id = HashableId::decode($hash)[0] ?? null;
+    public function Index($uuid){
 
-        $user = User::findOrFail($id);
+        $user = User::where('uuid', $uuid)->firstOrFail();
         return Inertia::render('Community/Profile/Index', [
             "user" => $user,
         ]);

@@ -24,6 +24,7 @@ class User extends Authenticatable
         'password',
         'role',
         'avatar',
+        'uuid',
     ];
 
     /**
@@ -57,5 +58,16 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($user) {
+            do {
+                $user->uuid = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            } while (User::where('uuid', $user->uuid)->exists());
+        });
     }
 }

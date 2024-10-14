@@ -15,10 +15,9 @@ class CommunityController extends Controller
 {
     public function index()
     {
-        $user = User::find(1);
-        $hashedId = $user->hash;
+        $userid = Auth::user()->uuid;
         return Inertia::render('Community/Dashboard', [
-            'hashedId' => $hashedId,
+            'userid' => $userid,
             'communityPosts' => Community::with('user')
                 ->where('status', 'approve')
                 ->latest()

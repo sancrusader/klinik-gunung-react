@@ -12,64 +12,66 @@ class DatabaseSeeder extends Seeder
     /**
      * Seed the application's database.
      */
-    public function run(): void
+    public function run()
     {
-               $userData = [
+        $userData = [
             [
                 'name' => 'Admin User',
                 'email' => 'admin@example.com',
                 'role' => 'admin',
-                'password' => Hash::make('sandifox')
+                'password' => Hash::make('password'),
             ],
             [
                 'name' => 'Paramedis User',
                 'email' => 'paramedis@example.com',
                 'role' => 'paramedis',
-                'password' => Hash::make('sandifox'),
+                'password' => Hash::make('password'),
             ],
             [
                 'name' => 'Cashier User',
                 'email' => 'cashier@example.com',
                 'role' => 'cashier',
-                'password' => Hash::make('sandifox'),
+                'password' => Hash::make('password'),
             ],
             [
                 'name' => 'Doctor User',
                 'email' => 'doctor@example.com',
                 'role' => 'doctor',
-                'password' => Hash::make('sandifox'),
+                'password' => Hash::make('password'),
             ],
             [
                 'name' => 'Manager User',
                 'email' => 'manager@example.com',
                 'role' => 'manager',
-                'password' => Hash::make('sandifox'),
+                'password' => Hash::make('password'),
             ],
             [
                 'name' => 'Coordinator User',
                 'email' => 'cordi@example.com',
                 'role' => 'cordi',
-                'password' => Hash::make('sandifox'),
+                'password' => Hash::make('password'),
             ],
             [
                 'name' => 'Patient User',
                 'email' => 'patient@example.com',
                 'role' => 'patients',
-                'password' => Hash::make('sandifox'),
+                'password' => Hash::make('password'),
             ],
             [
                 'name' => 'Sandi',
                 'email' => 'sandimaulanafz@gmail.com',
                 'role' => 'patients',
-                'password' => Hash::make('sandifox'),
+                'password' => Hash::make('password'),
             ],
         ];
 
-        // Insert data into the users table
-        foreach ($userData as $key =>  $user) {
-            User::create($user);
+        foreach ($userData as $data) {
+            // Membuat nomor acak 6 digit
+            do {
+                $uuid = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            } while (User::where('uuid', $uuid)->exists()); // Memastikan nomor unik
+
+            User::create(array_merge($data, ['uuid' => $uuid])); // Menyimpan pengguna dengan uuid
         }
-
-
     }
 }
