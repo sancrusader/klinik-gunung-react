@@ -5,7 +5,9 @@ namespace App\Http\Controllers\User;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Models\Screening\Offline;
+use App\Models\Screening\Payments;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PaymentsRequest;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Illuminate\Support\Facades\Storage;
 
@@ -31,32 +33,59 @@ class CashierController extends Controller
     public function Payment($id)
     {
         $screening = Offline::findOrFail($id);
-        return Inertia::render('Cashier/Screening/Offline/Payment', [
+        return Inertia::render('Cashier/Payment/Index', [
             'screening' => $screening,
         ]);
     }
 
-    public function confirmPaymentOffline(Request $request, $id)
+    /**
+     * Summary of confirmPaymentOffline
+     * @param \App\Http\Requests\PaymentsRequest $request
+     * @param mixed $id
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
+    public function confirmPaymentOffline(PaymentsRequest $request, $id)
     {
-        $validated = $request->validate([
-            'payment_method' => 'required|in:cash,qris,transfer',
-            'amount_paid' => 'required|in:50000,100000,150000,200000',
-            'quantity_product' => 'required|integer',
-        ]);
-
+        // Cari screening berdasarkan ID
         $screening = Offline::findOrFail($id);
 
-        if ($screening->payment_status) {
-            return response()->json(['error' => 'Pembayaran sudah dikonfirmasi sebelumnya.'], 400);
+        // Cek apakah sudah ada pembayaran terkait screening ini
+        $existingPayment = Payments::where('screening_id', $screening->id)->first();
+
+        if ($existingPayment && $existingPayment->payment_status) {
+            return response()->json(['error' => 'Pembayaran sudah dilakukan sebelumnya.'], 400);
         }
 
-        $screening->payment_status = true;
-        $screening->amount_paid = $validated['amount_paid'];
-        $screening->payment_method = $validated['payment_method'];
-        $screening->save();
+        // Simpan bukti pembayaran
+        $paymentProofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
 
-        return;
+        // Buat pembayaran baru
+        $payment = Payments::create([
+            'screening_id' => $screening->id,
+            'payment_status' => true,
+            'amount_paid' => $request->amount_paid,
+            'quantity_product' => $request->quantity_product,
+            'price_product' => $request->price_product,
+            'payment_proof' => $paymentProofPath, // Simpan path gambar
+        ]);
+
+        // Update status pembayaran pada screening
+        $screening->payment_status = true; // Atur status pembayaran menjadi true
+        $screening->save(); // Simpan perubahan ke database
+
+        return response()->json(['message' => 'Pembayaran berhasil diproses.'], 200);
     }
+
+    private function validatePayment(PaymentsRequest $request)
+    {
+        return $request->validated();
+    }
+
+    private function responseError(string $message)
+    {
+        return response()->json(['error' => $message], 400);
+    }
+
 
 
     public function history()

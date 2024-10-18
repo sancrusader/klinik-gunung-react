@@ -7,29 +7,35 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class PatientScreeningUpdated implements ShouldBroadcast
+class PatientScreeningUpdated implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * Create a new event instance.
-     */
-    public function __construct(public string $patient)
-    {
-
+    public function __construct(
+        public string $patient // This should be a string (e.g., patient's name or ID)
+    ) {
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
     public function broadcastOn(): array
     {
+        return [
+            new Channel('screening-user'),
+        ];
+    }
 
-        new Channel('patient');
+    public function broadcastAs(): string
+    {
+        return 'screening-process';
+    }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'patient' => $this->patient,
+        ];
     }
 }

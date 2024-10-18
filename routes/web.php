@@ -69,7 +69,7 @@ Route::middleware('auth')->group(function () {
     // Paramedis routes
     Route::middleware('role:paramedis')->prefix('dashboard/paramedis')->group(function () {
         Route::get('/', [ParamedisController::class, 'index'])->name('paramedis.dashboard');
-        Route::get('/screening/offline', [OfflineController::class, 'showScreeningOfflline'])->name('paramedis.screening.offline');
+        Route::get('/screening/offline', [OfflineController::class, 'showScreeningOffline'])->name('paramedis.screening.offline');
         Route::get('/screening/{id}/detail', [ParamedisController::class, 'QuestionerDetail'])->name('paramedis.questioner.detail');
         Route::get('/screening/online', [ParamedisController::class, 'ScreeningOnline'])->name('paramedis.screeningOnline');
         Route::post('/confirm/{id}', [ParamedisController::class, 'processHealthCheck'])->name('paramedis.confirm');
@@ -84,13 +84,13 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:cashier')->prefix('dashboard/cashier')->group(function () {
         Route::get('/', [CashierController::class, 'index'])->name('cashier.dashboard');
         Route::get('/screening/offline', [CashierController::class, 'ScreeningOffline'])->name('cashier.screening.offline');
-        Route::post('/confirm/{id}', [CashierController::class, 'confirmPaymentOffline'])->name('cashier.payment.offline');
+        // Route::post('/payment/screening/offline/{id}', [CashierController::class, 'confirmPaymentOffline'])->name('cashier.payment.offline');
         Route::get('/payment-history', [CashierController::class, 'history'])->name('cashier.history');
         Route::get('/screening/online', [OnlineController::class, 'ScreeningOnlinePayment'])->name('cashier.screening.online');
         Route::get('/screening/payment/{id}', [CashierController::class, 'Payment'])->name('payment.cashier');
         Route::post('/confirm-payment/{id}', [OnlineController::class, 'confirmPayment'])->name('cashier.confirmPayment');
     });
-
+    route::post('/dashboard/cashier/payment/screening/offline/{id}', [CashierController::class, 'confirmPaymentOffline'])->name('cashier.payment.offline');
     // Patient routes
     Route::middleware('role:patients')->prefix('dashboard')->group(function () {
         // Dashboard
@@ -152,7 +152,7 @@ Route::middleware('auth')->group(function () {
             Route::get('new', [ProductController::class, 'create'])->name('product.create');
             Route::post('store', [ProductController::class, 'store'])->name('products.store');
             Route::get('list', [EcommerceController::class, 'index'])->name('product.list');
-            
+
             // Category
             Route::prefix('category')->group(function () {
                 Route::get('/', [CategoryController::class, 'create'])->name('category.create');
@@ -218,13 +218,13 @@ Route::middleware('auth')->group(function () {
 
 
 /**
- * 
+ *
  * This Route Public
  */
 Route::prefix('product')->group(function () {
     Route::get('/', [ProductController::class, 'index'])->name('product');
     Route::post('/cart/{id}', [ProductController::class, 'addToCart'])->name('cart');
-    
+
 });
 
 // Blog
@@ -246,4 +246,3 @@ Route::get('/message', [TestController::class, 'index']);
 Route::post('/send', [TestController::class, 'sendMessage']);
 
 require __DIR__ . '/auth.php';
-

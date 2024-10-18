@@ -31,6 +31,7 @@ export default function Report({
     lastLogout,
     screenings,
 }: ReportProps) {
+
     const [searchQuery, setSearchQuery] = useState("");
 
     // Filter screenings based on the search query

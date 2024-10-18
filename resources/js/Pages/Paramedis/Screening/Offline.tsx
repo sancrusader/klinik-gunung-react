@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState } from "react"; // Pastikan untuk mengimpor useState
 import { PageProps } from "@/types";
 import PageContainer from "@/Layouts/PageContainer";
 import Header from "@/Layouts/HeaderParamedis";
 import HealthCheckForm from "@/Components/HealthCheck/HealthCheckForm";
 import { Toaster } from "sonner";
-
+import { Search } from "lucide-react";
 import {
     Table,
     TableBody,
@@ -18,18 +18,39 @@ import { usePage, Head, Link } from "@inertiajs/react";
 
 import { Screening } from "@/types/screening";
 
-interface Props {
-    screenings?: Screening[];
-}
+export default function Offline({ auth, screenings }: PageProps<{ screenings: any }>) {
+    // Ambil data screenings dari objek paginasi
+    const screeningsData = screenings?.data || [];  // Akses 'data' dari paginasi
 
-export default function Offline({ auth }: PageProps) {
-    const { screenings = [] } = usePage().props as Props;
+    // State untuk menyimpan kueri pencarian
+    const [searchQuery, setSearchQuery] = useState("");
+
+    // Filter screenings berdasarkan kueri pencarian
+    const filteredScreenings = screeningsData.filter((screening: Screening) => {
+        const fullNameMatch = screening.full_name
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase());
+        return fullNameMatch;
+    });
 
     return (
         <Header user={auth.user}>
             <PageContainer scrollable={true}>
                 <Head title="Screening Offline" />
                 <Toaster position="top-center" />
+
+                {/* Input untuk kueri pencarian */}
+                <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <input
+                    type="text"
+                    placeholder="Cari nama atau email"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-8 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                </div>
+
                 <Table>
                     <TableCaption>
                         List of Offline Screening Entries
@@ -51,7 +72,7 @@ export default function Offline({ auth }: PageProps) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {screenings.map((screening) => (
+                        {filteredScreenings.map((screening) => (
                             <TableRow key={screening.id}>
                                 <TableCell>{screening.queue_number}</TableCell>
                                 <TableCell>{screening.full_name}</TableCell>
@@ -90,13 +111,10 @@ export default function Offline({ auth }: PageProps) {
                                     </Link>
                                 </TableCell>
                                 <TableCell>
-                                    {screening.health_check_result ===
-                                    "sehat" ? (
+                                    {screening.health_check_result === "sehat" ? (
                                         <p>{screening.health_check_result}</p>
                                     ) : (
-                                        <HealthCheckForm
-                                            screening={screening}
-                                        />
+                                        <HealthCheckForm screening={screening} />
                                     )}
                                 </TableCell>
                             </TableRow>

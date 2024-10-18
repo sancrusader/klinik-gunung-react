@@ -67,10 +67,9 @@ class OfflineController extends Controller
     }
 
     // Menampilkan data ke paramedis
-    public function showScreeningOfflline()
+    public function showScreeningOffline()
     {
-        // Paginate data to optimize large dataset handling
-        $screenings = Offline::all();  // Adjust page size as needed
+        $screenings = Offline::paginate(10);
         return Inertia::render('Paramedis/Screening/Offline', [
             'screenings' => $screenings,
         ]);
@@ -80,12 +79,12 @@ class OfflineController extends Controller
     public function show()
     {
         $userId = Auth::user()->id;
-    
+
         // Paginate the screening data for better performance
         $screenings = Offline::where('user_id', $userId)
             ->orderBy('created_at', 'desc')
             ->paginate(10);  // Adjust page size as needed
-    
+
         return Inertia::render('Patients/Screening/HistoryOffline', [
             'screenings' => $screenings,
         ]);

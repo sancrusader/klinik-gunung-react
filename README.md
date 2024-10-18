@@ -1,12 +1,15 @@
 # Klinik Gunung
 
-```
+```bash
 php artisan serve
 ```
-```
+```bash
 php artisan queue:work
 ```
 
+```bash
+php artisan reverb:start
+```
 
 ## Fitur Utama
 

@@ -17,7 +17,7 @@ class TestController extends Controller
         $message  = $request->message;
 
         event(new PatientScreeningUpdated(
-            message: $message
+            patient: $message
         ));
 
         return response()->json(['message'=>'Berhasil',$message], 200);

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
+use App\Events\PatientScreeningUpdated;
 
 class GuestController extends Controller
 {
@@ -27,6 +28,11 @@ class GuestController extends Controller
         $user = $this->findOrCreateUser($request);
         $screeningOffline = $this->createScreeningRecord($user, $request);
         $this->updateScreeningQuestionnaireData($screeningOffline, $request);
+
+
+        event(new PatientScreeningUpdated(
+            patient: $screeningOffline,
+        ));
 
         return back()->with('success', "Pendaftaran berhasil dan data kuisioner berhasil disimpan, nomor antrian: {$screeningOffline->queue_number}");
     }
@@ -71,11 +77,11 @@ class GuestController extends Controller
     private function updateScreeningQuestionnaireData(Offline $screeningOffline, GuestRequest $request)
     {
         $updateData = [];
-    
+
         foreach (range(1, 6) as $index) {
             $updateData["physical_health_q{$index}"] = $this->getQuestionnaireAnswer($request, "physical_health_q{$index}");
         }
-    
+
         foreach (range(1, 5) as $index) {
             $updateData["experience_knowledge_q{$index}"] = $this->getQuestionnaireAnswer($request, "experience_knowledge_q{$index}");
         }

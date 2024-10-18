@@ -3,6 +3,7 @@
 namespace App\Models\Screening;
 
 use App\Models\User;
+use App\Models\Screening\Payments;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -37,8 +38,6 @@ class Offline extends Model
         'experience_knowledge_q4',
         'experience_knowledge_q5',
         'health_check_result',
-        'payment_status',
-        'amount_paid',
         'certificate_issued',
         'certificate_path',
         'blood_pressure',
@@ -71,6 +70,11 @@ class Offline extends Model
     public function paramedis()
     {
         return $this->belongsTo(User::class, 'paramedic_id');
+    }
+
+    public function payment()
+    {
+        return $this->hasOne(Payments::class, 'screening_id');
     }
 
 }
