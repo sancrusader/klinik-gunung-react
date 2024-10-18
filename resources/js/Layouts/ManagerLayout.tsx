@@ -46,6 +46,14 @@ export default function Manager({
                             </div>
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink
+                                    href={route("screening.manager")}
+                                    active={route().current("screening.manager")}
+                                >
+                                    Screening
+                                </NavLink>
+                            </div>
+                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                                <NavLink
                                     href={route("manager.shiff")}
                                     active={route().current("manager.shiff")}
                                 >

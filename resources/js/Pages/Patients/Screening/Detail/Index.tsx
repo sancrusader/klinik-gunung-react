@@ -1,11 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card"
+import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { Screening } from "@/types/screening"
 
 interface Questions {
   [key: string]: string
 }
 
-export default function ScreeningDetails({ screening, question }: { screening: Screening; question: Questions }) {
+export default function ScreeningDetails({screening, question }: { screening: Screening; question: Questions }) {
   const screeningDetails = [
     { label: "Nama Lengkap", value: screening.full_name },
     { label: "Umur", value: screening.age },
@@ -16,7 +17,8 @@ export default function ScreeningDetails({ screening, question }: { screening: S
   ]
 
   return (
-    <section className="flex h-screen items-center justify-center">
+
+    <main className="flex flex-col gap-8 p-6 md:p-10">
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader>
         <CardTitle>Screening Details {screening.full_name}</CardTitle>
@@ -25,8 +27,8 @@ export default function ScreeningDetails({ screening, question }: { screening: S
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {screeningDetails.map((detail, index) => (
             <div key={index} className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">{detail.label}</p>
-              <p className="text-base">{detail.value}</p>
+              <p className="text-sm font-bold text-muted-foreground ">{detail.label}</p>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{detail.value}</p>
             </div>
           ))}
         </div>
@@ -36,13 +38,13 @@ export default function ScreeningDetails({ screening, question }: { screening: S
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.keys(question).map((key) => (
             <div key={key} className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">{question[key]}</p>
-              <p className="text-base">{screening[key as keyof Screening] as string}</p>
+              <p className="text-sm font-bold text-muted-foreground">{question[key]}</p>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{screening[key as keyof Screening] as string}</p>
             </div>
           ))}
         </div>
       </CardContent>
     </Card>
-    </section>
+    </main>
   )
 }

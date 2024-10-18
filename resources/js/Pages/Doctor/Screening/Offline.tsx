@@ -35,7 +35,7 @@ export default function Offline({ auth }: PageProps) {
         <Header user={auth.user}>
             <PageContainer scrollable={true}>
                 <Head title="Screening Offline" />
-                <Toaster position="top-center" closeButton/>
+                <Toaster position="top-center" closeButton />
 
                 <Table>
                     <TableCaption>
@@ -79,30 +79,47 @@ export default function Offline({ auth }: PageProps) {
                                     </Link>
                                 </TableCell>
                                 <TableCell>
-                                        <Link
-                                            className="text-blue-600"
-                                            href={route(
-                                                "doctor.physical",
-                                                {
-                                                    id: screening.id,
-                                                }
-                                            )}
-                                        >
-                                            Pemeriksaan Fisik
-                                        </Link>
+                                    <Link
+                                        className="text-blue-600"
+                                        href={route("doctor.physical", {
+                                            id: screening.id,
+                                        })}
+                                    >
+                                        Pemeriksaan Fisik
+                                    </Link>
                                 </TableCell>
                                 <TableCell>
-                                    {screening.health_check_result ? (
-                                        <span>
-                                            {screening.health_check_result}
-                                        </span>
-                                    ) : (
-                                        <HealthCheckForm
-                                            screening={screening}
-                                            onSuccess={handleSuccess}
-                                            onError={handleError}
-                                        />
-                                    )}
+                                    {
+                                        screening.health_check_result ? (
+                                            <span>
+                                                {screening.health_check_result}
+                                            </span>
+                                        ) : // Memeriksa apakah pasien menunjukkan tanda-tanda penyakit jantung
+                                        screening.physical_health_q1.includes(
+                                              "Penyakit Jantung"
+                                          ) ||
+                                          screening.physical_health_q2.includes(
+                                              "Hipertensi (tekanan darah tinggi)"
+                                          ) ||
+                                          screening.physical_health_q3.includes(
+                                              "Hipotensi(tekanan darah rendah)"
+                                          ) ||
+                                          screening.physical_health_q4.includes(
+                                              "Diabetes"
+                                          ) ||
+                                          screening.physical_health_q5.includes(
+                                              "Masalah paru-paru lainnya"
+                                          ) ||
+                                          screening.physical_health_q6.includes(
+                                              "Cedera sendi/lutut/pergelangan kaki"
+                                          ) ? (
+                                            <HealthCheckForm
+                                                screening={screening}
+                                                onSuccess={handleSuccess}
+                                                onError={handleError}
+                                            />
+                                        ) : null // Tidak menampilkan apa-apa jika tidak ada gejala penyakit jantung
+                                    }
                                 </TableCell>
                             </TableRow>
                         ))}

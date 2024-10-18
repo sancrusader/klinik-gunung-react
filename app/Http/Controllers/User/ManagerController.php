@@ -18,62 +18,8 @@ use SebastianBergmann\CodeCoverage\Report\Xml\Report;
 
 class ManagerController extends Controller
 {
-     public function index()
+    public function index()
     {
-
-        $latestScreening = Offline::orderBy('created_at', 'desc')->take(5)->get();
-
-        $patientsData = User::where('role', 'pasien') // Ambil berdasarkan peran pasien
-            ->selectRaw('DATE(created_at) as date, COUNT(*) as total_patients')
-            ->where('created_at', '>=', Carbon::now()->subDays(1))
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
-
-        // Siapkan data untuk chart
-        $datesPasien = [];
-        $totalsPasien = [];
-
-        foreach ($patientsData as $data) {
-            $datesPasien[] = Carbon::parse($data->date)->format('d F');
-            $totalsPasien[] = $data->total_patients;
-        }
-
-        // Ambil total pendapatan minggu ini
-        $paymentsData = Offline::selectRaw('DATE(created_at) as date, SUM(amount_paid) as total_payment')
-            ->where('created_at', '>=', Carbon::now()->subDays(7))
-            ->where('payment_status', true) // Hanya mengambil data yang sudah dibayar
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
-
-        // Siapkan data untuk chart
-        $dates = [];
-        $totals = [];
-
-        foreach ($paymentsData as $data) {
-            $dates[] = Carbon::parse($data->date)->format('d F');
-            $totals[] = $data->total_payment;
-        }
-
-        $totalPaymentsThisWeek = Offline::where('payment_status', true)
-            ->where('created_at', '>=', Carbon::now()->startOfWeek())
-            ->sum('amount_paid');
-
-        $totalPaymentsLastWeek = Offline::where('payment_status', true)
-            ->whereBetween('created_at', [
-                Carbon::now()->subWeek()->startOfWeek(),
-                Carbon::now()->subWeek()->endOfWeek()
-            ])->sum('amount_paid');
-
-        if ($totalPaymentsLastWeek > 0) {
-            $percentageChange = (($totalPaymentsThisWeek - $totalPaymentsLastWeek) / $totalPaymentsLastWeek) * 100;
-        } else {
-            $percentageChange = 100;
-        }
-
-        $totalPatients = User::where('role', 'patient')->count();
-
         return inertia('Manager/Dashboard');
     }
 
@@ -95,7 +41,7 @@ class ManagerController extends Controller
             'created_by' => auth()->id(),
         ]);
 
-        return redirect()->route('dashboard.manajer.reports')->with('success', 'Laporan berhasil dibuat.');
+        return;
     }
 
     private function generateReportContent($type, $startDate, $endDate)
@@ -152,28 +98,49 @@ class ManagerController extends Controller
         return view('dashboard.manajer.screening.screening_activity', compact('screenings'));
     }
 
+
     public function generatePDF(Request $request)
     {
-        // Ambil parameter periode (weekly atau monthly)
+        // Ambil parameter dari request
         $periode = $request->input('periode');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
 
-        // Inisialisasi variabel tanggal awal dan akhir
-        $startDate = null;
-        $endDate = null;
-
-        if ($periode == 'weekly') {
-            // Set tanggal awal dan akhir untuk laporan mingguan
-            $startDate = Carbon::now()->startOfWeek();
-            $endDate = Carbon::now()->endOfWeek();
-        } elseif ($periode == 'monthly') {
-            // Set tanggal awal dan akhir untuk laporan bulanan
-            $startDate = Carbon::now()->startOfMonth();
-            $endDate = Carbon::now()->endOfMonth();
+        // Jika periode adalah 'today', gunakan tanggal hari ini
+        if ($periode === 'today') {
+            $startDate = Carbon::now()->startOfDay();
+            $endDate = Carbon::now()->endOfDay();
+        } elseif ($periode === 'weekly') {
+            // Jika periode adalah 'weekly', gunakan tanggal yang dimasukkan oleh user
+            // Pastikan untuk mengonversi string menjadi Carbon
+            if ($startDate && $endDate) {
+                $startDate = Carbon::parse($startDate)->startOfDay();
+                $endDate = Carbon::parse($endDate)->endOfDay();
+            } else {
+                // Jika tidak ada input dari pengguna, default ke minggu ini
+                $startDate = Carbon::now()->startOfWeek();
+                $endDate = Carbon::now()->endOfWeek();
+            }
+        } elseif ($periode === 'monthly') {
+            // Jika periode adalah 'monthly', gunakan tanggal yang dimasukkan oleh user
+            // Pastikan untuk mengonversi string menjadi Carbon
+            if ($startDate) {
+                $startDate = Carbon::parse($startDate)->startOfMonth();
+                $endDate = Carbon::parse($startDate)->endOfMonth(); // Ambil akhir bulan dari start_date
+            } else {
+                // Jika tidak ada input dari pengguna, default ke bulan ini
+                $startDate = Carbon::now()->startOfMonth();
+                $endDate = Carbon::now()->endOfMonth();
+            }
+        } else {
+            // Gunakan input pengguna jika periode tidak sesuai
+            $startDate = Carbon::parse($startDate)->startOfDay();
+            $endDate = Carbon::parse($endDate)->endOfDay();
         }
 
-        // Query data berdasarkan periode yang dipilih
+        // Query data berdasarkan periode atau rentang tanggal yang dipilih
         $screeningOnlineDetails = Online::whereBetween('created_at', [$startDate, $endDate])->get();
-        $totalScreeningOnline = Online::whereBetween('created_at', [$startDate, $endDate])->count();
+        $totalScreeningOnline = $screeningOnlineDetails->count();
 
         $screeningDetails = Offline::whereBetween('created_at', [$startDate, $endDate])->get();
         $totalScreeningOffline = $screeningDetails->count();
@@ -182,17 +149,20 @@ class ManagerController extends Controller
         // Data yang akan dikirim ke view
         $data = [
             'periode' => $periode,
+            'start_date' => $startDate,  // Ganti startDate menjadi start_date
+            'end_date' => $endDate,      // Ganti endDate menjadi end_date
             'totalScreeningOnline' => $totalScreeningOnline,
             'screeningOnlineDetails' => $screeningOnlineDetails,
             'totalScreeningOffline' => $totalScreeningOffline,
             'totalUangMasuk' => $totalUangMasuk,
             'screeningDetails' => $screeningDetails,
+            'tanggalLaporan' => Carbon::now()->format('d-m-Y'), // Tanggal laporan dibuat
         ];
 
         // Buat objek PDF menggunakan Dompdf
         $pdf = new Dompdf();
         $options = new Options();
-        $options->set('defaultFont', 'Arial'); // Atur font default
+        $options->set('defaultFont', 'Arial');
         $pdf->setOptions($options);
 
         // Render view ke dalam PDF
@@ -202,12 +172,15 @@ class ManagerController extends Controller
         return $pdf->stream('report.pdf');
     }
 
-    public function reportManager(){
+
+    public function reportManager()
+    {
         return inertia('Manager/Report/Index');
     }
 
 
-    public function Shift(){
+    public function Shift()
+    {
         $staff = User::whereIn('role', ['paramedis', 'doctor', 'admin', 'cashier'])->get();
         return inertia('Manager/Shift/Index', [
             'staff' => $staff,
@@ -232,5 +205,14 @@ class ManagerController extends Controller
         ]);
 
         return;
+    }
+
+    public function ScreeningOffline()
+    {
+        $screenings = Offline::with('paramedis')->get();
+        return Inertia::render('Manager/Screening/Index', [
+            'screenings' => $screenings,
+
+        ]);
     }
 }

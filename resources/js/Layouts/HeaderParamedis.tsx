@@ -55,6 +55,12 @@ export default function Header({
                         Online
                     </NavLink>
                     <NavLink
+                        href={route("paramedis.report")}
+                        active={route().current("paramedis.report")}
+                    >
+                        Report
+                    </NavLink>
+                    <NavLink
                         href={route("community")}
                         active={route().current("community")}
                     >

@@ -24,6 +24,7 @@ class GuestRequest extends FormRequest
         $rules = [
         'full_name' => 'required|string|max:255',
         'age' => 'required|integer',
+        'email' => 'required|email|max:255|unique:users,email',
         'gender' => 'required|string',
         'contact_number' => 'required|string|max:15',
         'planned_hiking_date' => 'required|date',

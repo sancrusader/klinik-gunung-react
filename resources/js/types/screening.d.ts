@@ -1,6 +1,12 @@
 export interface Screening {
     id: number;
     full_name: string;
+    paramedic_id: number;
+    paramedis: {
+        // Ubah dari paramedic_id ke paramedic object
+        name: string;
+    };
+    doctor_id: number;
     queue_number: number;
     age: number;
     gender: string;

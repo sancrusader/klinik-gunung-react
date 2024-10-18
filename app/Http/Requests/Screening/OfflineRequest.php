@@ -21,10 +21,11 @@ class OfflineRequest extends FormRequest
      */
     public function rules(): array
     {
-            $rules = [
+        $rules = [
             'full_name' => 'required|string|max:255',
             'age' => 'required|integer',
             'gender' => 'required|string',
+            'email' => 'required|string',
             'contact_number' => 'required|string|max:15',
             'planned_hiking_date' => 'required|date',
             'previous_hikes_count' => 'required|integer',

@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
 import { toast, Toaster } from "sonner";
+import Header from "@/Layouts/HeaderParamedis";
 
 interface Screening {
   id: number;
@@ -20,7 +21,7 @@ interface Screening {
   medical_recommendations: string;
 }
 
-const HealthAssessment: React.FC<{ screening: Screening }> = ({ screening }) => {
+const HealthAssessment: React.FC<{ screening: Screening }> = ({ screening,auth }) => {
   const { data, setData, post, processing, errors } = useForm<Screening>({
     id: screening.id,
     blood_pressure: screening.blood_pressure || "",
@@ -49,7 +50,7 @@ const HealthAssessment: React.FC<{ screening: Screening }> = ({ screening }) => 
   const [recommendationValue, notRecommendedReason] = (data.is_recommended_for_hiking || "").split("|");
 
   return (
-    <>
+    <Header user={auth.user}>
       <Toaster position="top-right" />
       <form onSubmit={handleSubmit} className="space-y-6 max-w-xl mx-auto">
         <div>
@@ -205,7 +206,7 @@ const HealthAssessment: React.FC<{ screening: Screening }> = ({ screening }) => 
           {processing ? "Mengirim..." : "Kirim Penilaian Kesehatan"}
         </Button>
       </form>
-    </>
+    </Header>
   );
 };
 

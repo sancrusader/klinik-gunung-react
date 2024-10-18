@@ -2,6 +2,8 @@ import React from "react";
 import { PageProps } from "@/types";
 import PageContainer from "@/Layouts/PageContainer";
 import Header from "@/Layouts/HeaderParamedis";
+import HealthCheckForm from "@/Components/HealthCheck/HealthCheckForm";
+import { Toaster } from "sonner";
 
 import {
     Table,
@@ -27,7 +29,7 @@ export default function Offline({ auth }: PageProps) {
         <Header user={auth.user}>
             <PageContainer scrollable={true}>
                 <Head title="Screening Offline" />
-
+                <Toaster position="top-center" />
                 <Table>
                     <TableCaption>
                         List of Offline Screening Entries
@@ -65,37 +67,37 @@ export default function Offline({ auth }: PageProps) {
                                     {screening.previous_hikes_count}
                                 </TableCell>
                                 <TableCell>
-                                        <Link
-                                            className="text-blue-600"
-                                            href={route(
-                                                "paramedis.questioner.detail",
-                                                {
-                                                    id: screening.id,
-                                                }
-                                            )}
-                                        >
-                                            Sudah Mengisi
-                                        </Link>
+                                    <Link
+                                        className="text-blue-600"
+                                        href={route(
+                                            "paramedis.questioner.detail",
+                                            {
+                                                id: screening.id,
+                                            }
+                                        )}
+                                    >
+                                        Sudah Mengisi
+                                    </Link>
                                 </TableCell>
                                 <TableCell>
-                                        <Link
-                                            className="text-blue-600"
-                                            href={route(
-                                                "physical.paramedis",
-                                                {
-                                                    id: screening.id,
-                                                }
-                                            )}
-                                        >
-                                            Pemeriksaan Fisik
-                                        </Link>
+                                    <Link
+                                        className="text-blue-600"
+                                        href={route("physical.paramedis", {
+                                            id: screening.id,
+                                        })}
+                                    >
+                                        Pemeriksaan Fisik
+                                    </Link>
                                 </TableCell>
                                 <TableCell>
-                                    <TableCell>
-                                            <span>
-                                                {screening.health_check_result}
-                                            </span>
-                                    </TableCell>
+                                    {screening.health_check_result ===
+                                    "sehat" ? (
+                                        <p>{screening.health_check_result}</p>
+                                    ) : (
+                                        <HealthCheckForm
+                                            screening={screening}
+                                        />
+                                    )}
                                 </TableCell>
                             </TableRow>
                         ))}

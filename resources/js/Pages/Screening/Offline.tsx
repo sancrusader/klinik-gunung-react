@@ -6,7 +6,7 @@ import { Checkbox } from "@/Components/ui/checkbox";
 import { Button } from "@/Components/ui/button";
 import { Label } from "@/Components/ui/label";
 import { Alert, AlertDescription } from "@/Components/ui/alert";
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Input } from "@/Components/ui/input";
 import {
     Card,
@@ -43,6 +43,7 @@ interface Questions {
 type FormData = {
     full_name: string;
     age: string;
+    email: string;
     gender: string;
     contact_number: string;
     planned_hiking_date: string;
@@ -60,6 +61,7 @@ const Offline: React.FC<{
     const initialData: FormData = {
         full_name: "",
         age: "",
+        email: "",
         gender: "",
         contact_number: "",
         planned_hiking_date: "",
@@ -234,6 +236,23 @@ const Offline: React.FC<{
                                                     "full_name",
                                                     e.target.value
                                                 )
+                                            }
+                                        />
+                                        {errors.full_name && (
+                                            <p className="text-sm text-red-500">
+                                                {errors.full_name}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="email">Email</Label>
+                                        <Input
+                                            id="email"
+                                            type="text"
+                                            name="email"
+                                            value={data.email}
+                                            onChange={(e) =>
+                                                setData("email", e.target.value)
                                             }
                                         />
                                         {errors.full_name && (

@@ -1,4 +1,6 @@
-import { FormEventHandler } from "react";
+"use client";
+
+import { FormEventHandler, useState } from "react";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { Button } from "@/Components/ui/button";
 import {
@@ -10,18 +12,23 @@ import {
 } from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
+import { Eye, EyeOff } from "lucide-react";
 
 interface LoginProps {
     status?: string;
     canResetPassword: boolean;
 }
 
-export default function Login({ status, canResetPassword }: LoginProps) {
+export default function Component(
+    { status, canResetPassword }: LoginProps = { canResetPassword: true }
+) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: "",
         password: "",
         remember: false,
     });
+
+    const [showPassword, setShowPassword] = useState(false);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -31,10 +38,14 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         });
     };
 
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
     return (
-        <section className="flex h-screen items-center justify-center">
+        <section className="flex items-center justify-center h-screen">
             <Head title="Login" />
-            <Card className="mx-auto w-full max-w-sm">
+            <Card className="w-full max-w-sm mx-auto">
                 <CardHeader>
                     <CardTitle className="text-2xl">Login</CardTitle>
                     <CardDescription>
@@ -50,6 +61,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 type="email"
                                 name="email"
                                 value={data.email}
+                                placeholder="johndoe@example.com"
                                 onChange={(e) =>
                                     setData("email", e.target.value)
                                 }
@@ -73,16 +85,37 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     </Link>
                                 )}
                             </div>
-                            <Input
-                                id="password"
-                                type="password"
-                                name="password"
-                                value={data.password}
-                                onChange={(e) =>
-                                    setData("password", e.target.value)
-                                }
-                                required
-                            />
+                            <div className="relative">
+                                <Input
+                                    id="password"
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    value={data.password}
+                                    placeholder="password"
+                                    onChange={(e) =>
+                                        setData("password", e.target.value)
+                                    }
+                                    required
+                                />
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
+                                    onClick={togglePasswordVisibility}
+                                    aria-label={
+                                        showPassword
+                                            ? "Hide password"
+                                            : "Show password"
+                                    }
+                                >
+                                    {showPassword ? (
+                                        <EyeOff className="w-4 h-4" />
+                                    ) : (
+                                        <Eye className="w-4 h-4" />
+                                    )}
+                                </Button>
+                            </div>
                             {errors.password && (
                                 <p className="text-sm text-red-500">
                                     {errors.password}
@@ -100,7 +133,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             Login with Google
                         </Button>
                     </form>
-                    <div className="mt-4 text-center text-sm">
+                    <div className="mt-4 text-sm text-center">
                         Don&apos;t have an account?{" "}
                         <Link href={route("register")} className="underline">
                             Sign up

@@ -166,16 +166,11 @@ export default function Community({
                             <Search className="w-6 h-6" />
                         </Button>
 
-                        <Button
-                            onClick={() =>
-                                (window.location.href = route("community.post"))
-                            }
-                            variant="ghost"
-                            size="icon"
-                            className="text-gray-400 "
-                        >
+                        <Link href={`/community/post`}>
+                            <Button variant="ghost" size="icon" className="text-gray-400">
                             <PenSquare className="w-6 h-6" />
-                        </Button>
+                            </Button>
+                        </Link>
                         <Button
                             variant="ghost"
                             size="icon"

@@ -7,7 +7,7 @@ export default function Header({ children }: PropsWithChildren)
     return(
         <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
         <header className="px-4 lg:px-6 h-14 flex items-center">
-            <Link href="/" className="flex items-center justify-center" >
+            <Link href={route('home')} className="flex items-center justify-center" >
             <MountainIcon className="h-6 w-6" />
             <span className="sr-only">Acme Inc</span>
             </Link>

@@ -5,8 +5,8 @@ import { useForm, Head } from "@inertiajs/react";
 import { Checkbox } from "@/Components/ui/checkbox";
 import { Button } from "@/Components/ui/button";
 import { Label } from "@/Components/ui/label";
-import { Alert, AlertDescription } from "@/Components/ui/alert";
 import { Input } from "@/Components/ui/input";
+
 import {
     Card,
     CardContent,
@@ -14,6 +14,8 @@ import {
     CardTitle,
     CardDescription,
 } from "@/Components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from '@/Components/ui/alert';
+
 import {
     Select,
     SelectContent,
@@ -23,6 +25,7 @@ import {
 } from "@/Components/ui/select";
 import { Toaster, toast } from "sonner";
 import Header from "@/Layouts/Header";
+import { InfoIcon } from "lucide-react";
 
 interface Screening {
     id: number;
@@ -43,6 +46,7 @@ interface Questions {
 
 type FormData = {
     full_name: string;
+    email: string;
     age: string;
     gender: string;
     contact_number: string;
@@ -51,7 +55,11 @@ type FormData = {
     [key: string]: string | string[];
 };
 
-export default function Component({ screening, questions, auth }: {
+export default function Component({
+    screening,
+    questions,
+    auth,
+}: {
     screening: Screening;
     questions: Questions;
     auth: Auth;
@@ -60,6 +68,7 @@ export default function Component({ screening, questions, auth }: {
 
     const initialData: FormData = {
         full_name: "",
+        email: "",
         age: "",
         gender: "",
         contact_number: "",
@@ -103,12 +112,15 @@ export default function Component({ screening, questions, auth }: {
         e.preventDefault();
         post(route("guest.post"), {
             onSuccess: () => {
-                toast.success(`Screening untuk ${data.full_name} Berhasil Dibuat!`);
-
+                toast.success(
+                    `Screening untuk ${data.full_name} Berhasil Dibuat!`
+                );
             },
             onError: (errors) => {
                 setSuccessMessage(null);
-                toast.error("Failed to submit screening form. Please check the errors and try again.");
+                toast.error(
+                    "Failed to submit screening form. Please check the errors and try again."
+                );
                 console.error(errors);
             },
         });
@@ -201,17 +213,24 @@ export default function Component({ screening, questions, auth }: {
     );
 
     return (
-        <Header>
+            <Header>
             <Head title="Screening Offline" />
-            <Toaster position="top-center"/>
+            <Toaster position="top-center" />
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    <Alert className="mb-4">
+                        <InfoIcon className="h-4 w-4" />
+                        <AlertTitle>Informasi</AlertTitle>
+                        <AlertDescription>
+                            Setelah menyelesaikan screening. Anda akan menerima email berisi informasi untuk login ke sistem Klinik Gunung.
+                        </AlertDescription>
+
+                    </Alert>
                     <Card>
                         <CardHeader>
                             <CardTitle>Screening Now</CardTitle>
                             <CardDescription>
-                                Please fill out the form below for your hiking
-                                screening.
+                                Please fill out the form below for your hiking screening.
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -243,6 +262,23 @@ export default function Component({ screening, questions, auth }: {
                                         {errors.full_name && (
                                             <p className="text-sm text-red-500">
                                                 {errors.full_name}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="email">Email</Label>
+                                        <Input
+                                            id="email"
+                                            type="text"
+                                            name="email"
+                                            value={data.email}
+                                            onChange={(e) =>
+                                                setData("email", e.target.value)
+                                            }
+                                        />
+                                        {errors.email && (
+                                            <p className="text-sm text-red-500">
+                                                {errors.email}
                                             </p>
                                         )}
                                     </div>
@@ -438,6 +474,6 @@ export default function Component({ screening, questions, auth }: {
                     </Card>
                 </div>
             </div>
-            </Header>
+        </Header>
     );
 }

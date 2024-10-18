@@ -1,5 +1,6 @@
 import React from "react";
 import { useForm } from "@inertiajs/react";
+import { toast, Toaster } from "sonner";
 import {
     Select,
     SelectContent,
@@ -28,11 +29,9 @@ const healthStatusOptions: { value: HealthStatus; label: string }[] = [
 
 interface HealthCheckFormProps {
     screening: Screening;
-    onSuccess?: (message: string) => void;
-    onError?: (message: string) => void;
 }
 
-export default function HealthCheckForm({ screening, onSuccess, onError }: HealthCheckFormProps) {
+export default function HealthCheckForm({ screening }: HealthCheckFormProps) {
     const { data, setData, post, processing } = useForm<FormData>({
         health_check_result:
             (screening.health_check_result as HealthStatus) || "",
@@ -40,52 +39,59 @@ export default function HealthCheckForm({ screening, onSuccess, onError }: Healt
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route("health.check.doctor", screening.id), {
+        post(route("offline.healthcheck", screening.id), {
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => {
-                if (onSuccess) onSuccess("Health check result submitted successfully");
+                toast.success("Health check result submitted successfully");
             },
             onError: (errors) => {
-                if (onError) onError("Failed to submit health check result");
+                toast.error("Failed to submit health check result");
                 console.error(errors);
             },
         });
     };
 
     return (
-        <div className="w-full max-w-xs">
-            <form
-                onSubmit={handleSubmit}
-                className="flex items-center space-x-2"
-            >
-                <div>
-                    <Select
-                        value={data.health_check_result}
-                        onValueChange={(value: HealthStatus) =>
-                            setData("health_check_result", value)
-                        }
-                    >
-                        <SelectTrigger className="w-full mt-1">
-                            <SelectValue placeholder="Pilih Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {healthStatusOptions.map((option) => (
-                                <SelectItem
-                                    key={option.value}
-                                    value={option.value}
-                                >
-                                    {option.label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
+        <>
+            <Toaster position="top-center" />
+            <div className="w-full max-w-xs">
+                <form
+                    onSubmit={handleSubmit}
+                    className="flex items-center space-x-2"
+                >
+                    <div>
+                        <Select
+                            value={data.health_check_result}
+                            onValueChange={(value: HealthStatus) =>
+                                setData("health_check_result", value)
+                            }
+                        >
+                            <SelectTrigger className="w-full mt-1">
+                                <SelectValue placeholder="Pilih Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {healthStatusOptions.map((option) => (
+                                    <SelectItem
+                                        key={option.value}
+                                        value={option.value}
+                                    >
+                                        {option.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
 
-                <Button type="submit" disabled={processing} className="w-full">
-                    Submit
-                </Button>
-            </form>
-        </div>
+                    <Button
+                        type="submit"
+                        disabled={processing}
+                        className="w-full"
+                    >
+                        Submit
+                    </Button>
+                </form>
+            </div>
+        </>
     );
 }

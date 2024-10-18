@@ -15,7 +15,10 @@ class Offline extends Model
     // Kolom yang dapat diisi (mass-assignable)
        protected $fillable = [
         'user_id',
+        'paramedic_id',
+        'doctor_id',
         'full_name',
+        'email',
         'queue_number',
         'age',
         'gender',
@@ -38,17 +41,16 @@ class Offline extends Model
         'amount_paid',
         'certificate_issued',
         'certificate_path',
-        'blood_pressure', // Kolom baru
-        'heart_rate', // Kolom baru
-        'oxygen_saturation', // Kolom baru
-        'respiratory_rate', // Kolom baru
-        'body_temperature', // Kolom baru
-        'physical_assessment', // Kolom baru
-        'is_recommended_for_hiking', // Kolom baru
-        'not_recommended_reason', // Kolom baru
-        'medical_recommendations', // Kolom baru
+        'blood_pressure',
+        'heart_rate',
+        'oxygen_saturation',
+        'respiratory_rate',
+        'body_temperature',
+        'physical_assessment',
+        'is_recommended_for_hiking',
+        'not_recommended_reason',
+        'medical_recommendations',
     ];
-    // Cast atribut ke tipe data tertentu
     protected $casts = [
         'health_check_result' => 'string',
         'payment_status' => 'boolean',
@@ -66,5 +68,9 @@ class Offline extends Model
         return $this->belongsTo(User::class, 'user_id'); // Asumsikan ada user_id di ScreeningOffline
     }
 
+    public function paramedis()
+    {
+        return $this->belongsTo(User::class, 'paramedic_id');
+    }
 
 }
