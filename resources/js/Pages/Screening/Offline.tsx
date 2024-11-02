@@ -239,6 +239,7 @@ const Offline: React.FC<{
                                             type="text"
                                             name="full_name"
                                             value={data.full_name}
+                                            placeholder="Name"
                                             onChange={(e) =>
                                                 setData(
                                                     "full_name",
@@ -258,6 +259,7 @@ const Offline: React.FC<{
                                             id="email"
                                             type="text"
                                             name="email"
+                                            placeholder="Email"
                                             value={data.email}
                                             onChange={(e) =>
                                                 setData("email", e.target.value)
@@ -276,6 +278,7 @@ const Offline: React.FC<{
                                             id="age"
                                             type="number"
                                             name="age"
+                                            placeholder="Age"
                                             value={data.age}
                                             onChange={(e) =>
                                                 setData("age", e.target.value)
@@ -328,6 +331,7 @@ const Offline: React.FC<{
                                             type="tel"
                                             name="contact_number"
                                             value={data.contact_number}
+                                            placeholder="Contact Number"
                                             onChange={(e) =>
                                                 setData(
                                                     "contact_number",
@@ -350,6 +354,7 @@ const Offline: React.FC<{
                                             id="planned_hiking_date"
                                             type="date"
                                             name="planned_hiking_date"
+                                            placeholder="Planned Hiking Date"
                                             value={data.planned_hiking_date}
                                             onChange={(e) =>
                                                 setData(
@@ -373,6 +378,7 @@ const Offline: React.FC<{
                                             id="previous_hikes_count"
                                             type="number"
                                             name="previous_hikes_count"
+                                            placeholder="Previous Hikes Count"
                                             value={data.previous_hikes_count}
                                             onChange={(e) =>
                                                 setData(
