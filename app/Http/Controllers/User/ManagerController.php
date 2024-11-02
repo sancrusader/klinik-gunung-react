@@ -2,25 +2,37 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Http\Controllers\Controller;
+use App\Http\Resources\ScreeningResource;
+use App\Models\Report;
+use App\Models\Screening\Offline;
+use App\Models\Screening\Online;
+use App\Models\StaffSchedule;
+use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Dompdf\Dompdf;
 use Dompdf\Options;
-use App\Models\User;
-use Inertia\Inertia;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\Request;
-use App\Models\StaffSchedule;
 use Illuminate\Support\Carbon;
-use App\Models\Screening\Online;
-use App\Models\Screening\Offline;
-use App\Http\Controllers\Controller;
-use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Illuminate\Support\Facades\Storage;
-use SebastianBergmann\CodeCoverage\Report\Xml\Report;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ManagerController extends Controller
 {
     public function index()
     {
         return inertia('Manager/Dashboard');
+    }
+
+    // Page Profile Admin
+    public function profile(Request $request): Response
+    {
+        return Inertia::render('Profile/Manager', [
+            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'status' => session('status'),
+        ]);
     }
 
     public function generateReport(Request $request)
@@ -38,10 +50,9 @@ class ManagerController extends Controller
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'content' => $reportContent,
-            'created_by' => auth()->id(),
+            'created_by' => $request->created_by,
         ]);
 
-        return;
     }
 
     private function generateReportContent($type, $startDate, $endDate)
@@ -52,6 +63,7 @@ class ManagerController extends Controller
     public function viewReports()
     {
         $reports = Report::all();
+
         return view('dashboard.manajer.reports', compact('reports'));
     }
 
@@ -63,7 +75,7 @@ class ManagerController extends Controller
 
         return response()->json([
             'new_users' => $newUsers,
-            'percentage_change' => $this->getPercentageChange()
+            'percentage_change' => $this->getPercentageChange(),
         ]);
     }
 
@@ -95,9 +107,9 @@ class ManagerController extends Controller
         foreach ($screenings as $screening) {
             $screening->certificate_url = Storage::url($screening->certificate_path);
         }
+
         return view('dashboard.manajer.screening.screening_activity', compact('screenings'));
     }
-
 
     public function generatePDF(Request $request)
     {
@@ -160,8 +172,8 @@ class ManagerController extends Controller
         ];
 
         // Buat objek PDF menggunakan Dompdf
-        $pdf = new Dompdf();
-        $options = new Options();
+        $pdf = new Dompdf;
+        $options = new Options;
         $options->set('defaultFont', 'Arial');
         $pdf->setOptions($options);
 
@@ -172,16 +184,15 @@ class ManagerController extends Controller
         return $pdf->stream('report.pdf');
     }
 
-
     public function reportManager()
     {
         return inertia('Manager/Report/Index');
     }
 
-
     public function Shift()
     {
         $staff = User::whereIn('role', ['paramedis', 'doctor', 'admin', 'cashier'])->get();
+
         return inertia('Manager/Shift/Index', [
             'staff' => $staff,
         ]);
@@ -204,15 +215,22 @@ class ManagerController extends Controller
             'role' => $request->role,
         ]);
 
-        return;
     }
 
-    public function ScreeningOffline()
+    public function ScreeningOffline(Request $request)
     {
-        $screenings = Offline::with('paramedis')->get();
-        return Inertia::render('Manager/Screening/Index', [
-            'screenings' => $screenings,
+        $validatedData = $request->validate([
+            'perpage' => 'sometimes|nullable|integer|min:1|max:100',
+        ]);
 
+        $perpage = $validatedData['perpage'] ?? 10;
+
+        $screenings = Offline::with(['paramedis', 'user'])
+            ->whereNotNull('health_check_result')
+            ->paginate($perpage);
+
+        return Inertia::render('Manager/Screening/Index', [
+            'screenings' => ScreeningResource::collection($screenings),
         ]);
     }
 }

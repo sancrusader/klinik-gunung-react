@@ -8,8 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
 import { toast, Toaster } from "sonner";
-import Header from "@/Layouts/HeaderParamedis";
-
+import ParamedisSidebar from "@/Layouts/Dashboard/ParamedisSidebar";
+import PageContainer from "@/Layouts/PageContainer";
 interface Screening {
   id: number;
   blood_pressure: string;
@@ -21,7 +21,7 @@ interface Screening {
   medical_recommendations: string;
 }
 
-const HealthAssessment: React.FC<{ screening: Screening }> = ({ screening,auth }) => {
+const HealthAssessment: React.FC<{ screening: Screening }> = ({ screening }) => {
   const { data, setData, post, processing, errors } = useForm<Screening>({
     id: screening.id,
     blood_pressure: screening.blood_pressure || "",
@@ -50,7 +50,8 @@ const HealthAssessment: React.FC<{ screening: Screening }> = ({ screening,auth }
   const [recommendationValue, notRecommendedReason] = (data.is_recommended_for_hiking || "").split("|");
 
   return (
-    <Header user={auth.user}>
+    <ParamedisSidebar header={'Physical Examination'}>
+        <PageContainer scrollable={true}>
       <Toaster position="top-right" />
       <form onSubmit={handleSubmit} className="space-y-6 max-w-xl mx-auto">
         <div>
@@ -206,7 +207,8 @@ const HealthAssessment: React.FC<{ screening: Screening }> = ({ screening,auth }
           {processing ? "Mengirim..." : "Kirim Penilaian Kesehatan"}
         </Button>
       </form>
-    </Header>
+      </PageContainer>
+      </ParamedisSidebar>
   );
 };
 

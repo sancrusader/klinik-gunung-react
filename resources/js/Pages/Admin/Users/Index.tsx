@@ -1,5 +1,4 @@
 import { PageProps } from "@/types";
-import AdminLayout from "@/Layouts/AdminLayout";
 import { usePage, Head, Link } from "@inertiajs/react";
 import {
     Table,
@@ -14,21 +13,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { CalendarIcon, PlusIcon, SearchIcon, UserIcon } from "lucide-react";
-import { Screening } from "@/types/screening";
-
+import AdminSidebar from "@/Layouts/Dashboard/AdminSidebar";
 
 
 export default function Users({ auth }: PageProps) {
 
     return (
-        <AdminLayout
-            user={auth.user}
-            header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Users
-                </h2>
-            }
-        >
+        <AdminSidebar header={'Admin Dashboard'}>
             <Head title="Offline Screening" />
 
             <div className="py-12">
@@ -135,6 +126,6 @@ export default function Users({ auth }: PageProps) {
                     </Card>
                 </div>
             </div>
-        </AdminLayout>
+        </AdminSidebar>
     );
 }

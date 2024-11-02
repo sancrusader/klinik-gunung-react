@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\Ecommerce;
 
-use Illuminate\Http\Request;
-use App\Models\Ecommerce\Order;
-use App\Models\Ecommerce\Product;
-use App\Models\Ecommerce\OrderItem;
 use App\Http\Controllers\Controller;
+use App\Models\Ecommerce\Order;
+use App\Models\Ecommerce\OrderItem;
+use App\Models\Ecommerce\Product;
+use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
     public function index($orderId)
     {
         $order = Order::with('items.product')->findOrFail($orderId);
+
         return view('admin.order-items.index', compact('order'));
     }
 
@@ -21,6 +22,7 @@ class OrderController extends Controller
     {
         $order = Order::findOrFail($orderId);
         $products = Product::all(); // Menampilkan semua produk yang bisa ditambahkan
+
         return view('admin.order-items.create', compact('order', 'products'));
     }
 
@@ -51,6 +53,7 @@ class OrderController extends Controller
     {
         $orderItem = OrderItem::where('order_id', $orderId)->findOrFail($itemId);
         $products = Product::all();
+
         return view('admin.order-items.edit', compact('orderItem', 'products'));
     }
 

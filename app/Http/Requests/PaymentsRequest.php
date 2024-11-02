@@ -22,10 +22,13 @@ class PaymentsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount_paid' => 'required|numeric',
-            'quantity_product' => 'nullable|integer',
-            'price_product' => 'nullable|numeric',
-            'payment_proof' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Validasi gambar
+            'payment_method' => 'required|string|in:qris,cash,transfer',
+            'amount_paid' => 'required|numeric|min:0',
+            'quantity_product' => 'nullable|integer|min:0',
+            'price_product' => 'nullable|numeric|min:0',
+            'payment_proof' => $this->payment_method === 'qris' || $this->payment_method === 'transfer'
+                ? 'required|file|mimes:jpg,jpeg,png|max:2048'
+                : 'nullable|file|mimes:jpg,jpeg,png|max:2048',
         ];
     }
 }

@@ -3,8 +3,8 @@
 namespace App\Models\Clinic;
 
 use App\Models\Screening\Scan;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class HealthCheck extends Model
 {
@@ -23,7 +23,7 @@ class HealthCheck extends Model
         'question1',
         'question2',
         'question3',
-        'health_status'
+        'health_status',
     ];
 
     public function scan()

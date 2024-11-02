@@ -4,17 +4,17 @@ namespace App\Models;
 
 use App\Models\Ecommerce\Order;
 use App\Models\Screening\Offline;
+use App\Models\Screening\Payments;
+use App\Models\Community\Community;
 use App\Models\Activity\UserActivity;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Veelasky\LaravelHashId\Eloquent\HashableId;
-use App\Models\Screening\HikingHealthExperience;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HashableId;
+    use HasFactory, HashableId, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -28,6 +28,9 @@ class User extends Authenticatable
         'role',
         'avatar',
         'uuid',
+        'provider',
+        'provider_id',
+        'provider_token',
     ];
 
     /**
@@ -79,10 +82,16 @@ class User extends Authenticatable
         return $this->belongsTo(User::class, 'paramedic_id');
     }
 
+    public function paramedis()
+    {
+        return $this->belongsTo(User::class, 'paramedic_id');
+    }
+
     public function doctor()
     {
         return $this->belongsTo(User::class, 'doctor_id');
     }
+
     public function screenings()
     {
         return $this->hasMany(Offline::class, 'user_uuid', 'uuid'); // 'uuid' adalah kolom UUID di tabel users
@@ -91,5 +100,17 @@ class User extends Authenticatable
     public function activities()
     {
         return $this->hasMany(UserActivity::class);
+    }
+
+    // Relasi dengan community  
+    public function community()
+    {
+        return $this->hasOne(Community::class, 'user_id', 'uuid'); // Pastikan ini sesuai
+    }
+
+    // Relasi dengan payments
+    public function payments()
+    {
+        return $this->hasMany(Payments::class, 'cashier_id');
     }
 }

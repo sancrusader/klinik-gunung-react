@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState, FormEvent } from "react";
-import { useForm, usePage } from "@inertiajs/react";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { useForm, usePage, Head } from "@inertiajs/react";
 import { PageProps } from "@/types";
 import { Alert, AlertDescription } from "@/Components/ui/alert";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
+import AppSidebar from "@/Layouts/Dashboard/Sidebar"
 import {
     Select,
     SelectContent,
@@ -61,7 +61,8 @@ export default function CreateAppointment({ auth, doctors }: Props) {
     };
 
     return (
-        <AuthenticatedLayout user={auth.user}>
+        <AppSidebar header={'Appointment'}>
+            <Head title={'Appointments Create'}/>
             <div className="container mx-auto py-12">
                 <Card className="max-w-2xl mx-auto">
                     <CardHeader>
@@ -194,6 +195,6 @@ export default function CreateAppointment({ auth, doctors }: Props) {
                     </CardContent>
                 </Card>
             </div>
-        </AuthenticatedLayout>
+        </AppSidebar>
     );
 }

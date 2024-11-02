@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { PageProps } from "@/types";
-import CashierLayout from "@/Layouts/CashierLayout";
 import { usePage, Head, router } from "@inertiajs/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { SearchIcon } from "lucide-react";
+import CashierSidebar from "@/Layouts/Dashboard/CashierSidebar";
 import {
     Table,
     TableBody,
@@ -50,15 +50,8 @@ export default function PaymentOnline({
 
     return (
         <>
-            <CashierLayout
-                user={auth.user}
-                header={
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                        Screening Online List
-                    </h2>
-                }
-            >
-                <Head title="Offline Screening" />
+            <CashierSidebar header={'Online Screening'}>
+                <Head title="Online Screening" />
 
                 <div className="py-12">
                     <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -148,7 +141,7 @@ export default function PaymentOnline({
                         </Card>
                     </div>
                 </div>
-            </CashierLayout>
+            </CashierSidebar>
         </>
     );
 }

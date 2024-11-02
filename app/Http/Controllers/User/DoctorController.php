@@ -2,17 +2,22 @@
 
 namespace App\Http\Controllers\User;
 
-use Inertia\Inertia;
-use Illuminate\Http\Request;
-use App\Models\Screening\Offline;
+use App\Helpers\ScreeningOfflineHelper;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\ScreeningResource;
 use App\Models\Appointment\Appointment;
+use App\Models\Screening\Offline;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class DoctorController extends Controller
 {
     // Halaman utama dokter
-    public function index(){
+    public function index()
+    {
         return Inertia::render('Doctor/Dashboard');
     }
 
@@ -25,31 +30,49 @@ class DoctorController extends Controller
             ->get();
 
         return Inertia::render('Doctor/Appointment/Appointment', [
-            'appointments' => $appointments
+            'appointments' => $appointments,
+        ]);
+    }
+
+    public function profile(Request $request): Response
+    {
+        return Inertia::render('Profile/Doctor', [
+            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'status' => session('status'),
         ]);
     }
 
     // Menampilkan Offline Screening Pada Dokter
-    public function OfflineScreening()
+    public function OfflineScreening(Request $request)
     {
-        $screenings = Offline::all();
+        $validatedData = $request->validate([
+            'perpage' => 'sometimes|nullable|integer|min:1|max:100',
+        ]);
+
+        $perpage = $validatedData['perpage'] ?? 10;
+
+        // Menampilkan screening dengan penyakit jantung
+        $screenings = Offline::where('physical_health_q1', '=', 'penyakit jantung')
+            ->paginate($perpage);
+
         return Inertia::render('Doctor/Screening/Offline', [
-            'screenings' => $screenings,
+            'screenings' => ScreeningResource::collection($screenings),
+            'pagination_links' => $screenings->links()->render(),
         ]);
     }
 
     // Menampilkan detail questioner yang pasien buat
     public function QuestionerDetail($id)
-        {
-            $screening = Offline::with('user')->findOrFail($id);
+    {
+        $screening = Offline::with('user')->findOrFail($id);
 
-            $questions = $this->getScreeningQuestions();
+        $questions = ScreeningOfflineHelper::getScreeningQuestions();
 
-            return Inertia::render('Doctor/Questioner/Index', [
-                'screening' => $screening,
-                'questions' => $questions,
-            ]);
-        }
+        return Inertia::render('Doctor/Questioner/Index', [
+            'screening' => $screening,
+            'questions' => $questions,
+        ]);
+    }
 
     public function updateHealthCheck(Request $request, $id)
     {
@@ -69,26 +92,8 @@ class DoctorController extends Controller
         $screening = Offline::findOrFail($id);
 
         // Kirim data ke halaman Inertia
-        return Inertia::render('Doctor/Questioner/Physical', [
-            'screening' => $screening
+        return Inertia::render('Doctor/PhysicalExamination/Index', [
+            'screening' => $screening,
         ]);
-    }
-
-    // Questioner
-    private function getScreeningQuestions()
-    {
-        return [
-            'physical_health_q1' => 'Apakah Anda memiliki riwayat penyakit berikut ini?',
-            'physical_health_q2' => 'Kapan terakhir kali Anda Melakukan Pemeriksaan kesehatan umum?',
-            'physical_health_q3' => 'Apakah Anda memiliki masalah dengan:',
-            'physical_health_q4' => 'Apakah Anda sedang dalam pengobatan rutin atau menggunakan obat tertentu? jika ya, sebutkan:',
-            'physical_health_q5' => 'Bagaimana Anda menilai kondisi fisik Anda saat ini untuk pendakian (misal: kekuatan otot, keseimbangan, stamina)?',
-            'physical_health_q6' => 'Apakah Anda memiliki alergi (terhadap makanan, obat, atau lainnya)? Jika Ya, Sebutkan:',
-            'experience_knowledge_q1' => 'Apakah Anda pernah mendaki Gunung Semeru sebelumnya?',
-            'experience_knowledge_q2' => 'Apakah Anda pernah mengalami Altitude Sickness (mabuk ketinggian)?',
-            'experience_knowledge_q3' => 'Apakah Anda mengetahui cara menangani situasi darurat seperti hipotermia, dehidrasi, atau cedera selama pendakian?',
-            'experience_knowledge_q4' => 'Apakah Anda membawa atau tahu cara menggunakan perlengkapan berikut? (Centang semua yang sesuai)?',
-            'experience_knowledge_q5' => 'Bagaimana persiapan Anda menghadapi perubahan cuaca di Gunung Semeru?',
-        ];
     }
 }

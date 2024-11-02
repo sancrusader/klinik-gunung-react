@@ -1,105 +1,53 @@
-import {Link} from "@inertiajs/react";
-import { useState, PropsWithChildren, ReactNode } from "react";
-import { Package2, Home, ShoppingCart, Package, Users2, LineChart, Settings } from "lucide-react"; // Import icons yang dibutuhkan
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/Components/ui/tooltip"; // Asumsi menggunakan Tooltip dari UI library
-import { PageProps } from "@/types";
-import { User } from "@/types";
+import React from "react";
+import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/Components/ui/sidebar";
+import { AppSidebar } from "@/Components/AppSidebar";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Plus } from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/Components/ui/breadcrumb";
+import { ChevronRight } from "lucide-react";
+import PageContainer from "../PageContainer";
 
-export default function Layout({
-    user,
-    header,
-    children,
-}: PropsWithChildren<{ user: User; header?: ReactNode }>) {
+export default function Layout({ header, children }: { header: React.ReactNode, children: React.ReactNode }) {
   return (
-    <div className="flex">
-      <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
-        <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
-          <Link
-            href="#"
-            className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
-          >
-            <Package2 className="h-4 w-4 transition-all group-hover:scale-110" />
-            <span className="sr-only">Acme Inc</span>
-          </Link>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-              >
-                <Home className="h-5 w-5" />
-                <span className="sr-only">Dashboard</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Dashboard</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-              >
-                <ShoppingCart className="h-5 w-5" />
-                <span className="sr-only">Orders</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Orders</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-              >
-                <Package className="h-5 w-5" />
-                <span className="sr-only">Products</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Products</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-              >
-                <Users2 className="h-5 w-5" />
-                <span className="sr-only">Customers</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Customers</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-              >
-                <LineChart className="h-5 w-5" />
-                <span className="sr-only">Analytics</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Analytics</TooltipContent>
-          </Tooltip>
-        </nav>
-        <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-              >
-                <Settings className="h-5 w-5" />
-                <span className="sr-only">Settings</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Settings</TooltipContent>
-          </Tooltip>
-        </nav>
-      </aside>
-
-      {/* Konten utama halaman */}
-      <main className="ml-14 flex-1 p-6">{children}</main>
-    </div>
+    <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <main>
+            <header className="flex items-center justify-between p-4 border-b">
+              <div className="flex items-center space-x-4">
+                <SidebarTrigger />
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem>
+                      <BreadcrumbLink href={route('dashboard')}>Dashboard</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator>
+                      <ChevronRight className="h-4 w-4" />
+                    </BreadcrumbSeparator>
+                    <BreadcrumbItem>
+                    {header && (
+                      <BreadcrumbPage>{header}</BreadcrumbPage>
+                    )}
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+              </div>
+            </header>
+            <div className="min-h-[100vh] flex-1 rounded-xl">
+            <PageContainer>
+              {children}
+              </PageContainer>
+            </div>
+          </main>
+        </SidebarInset>
+    </SidebarProvider>
   );
 }

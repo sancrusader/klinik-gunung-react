@@ -1,9 +1,9 @@
-import React from "react";
 import { PageProps } from "@/types";
 import PageContainer from "@/Layouts/PageContainer";
-import Header from "@/Layouts/HeaderParamedis";
+import ParamedisSidebar from "@/Layouts/Dashboard/ParamedisSidebar";
 import HealthCheckOnline from "@/Components/HealthCheck/HealthCheckOnline";
-
+import SearchBar from "@/Components/OfflineScreening/SearchBar";
+import { useState,useRef } from "react";
 import {
     Table,
     TableBody,
@@ -13,7 +13,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/Components/ui/table";
-import { usePage, Head, Link } from "@inertiajs/react";
+import { usePage, Head, Link,router } from "@inertiajs/react";
 import { ScreeningOnline } from "@/types/screening";
 
 interface Props {
@@ -22,12 +22,29 @@ interface Props {
 
 export default function HistoryOnline({ auth }: PageProps) {
     const { scans = [] } = usePage().props as Props;
+    const [searchQuery, setSearchQuery] = useState("");
+    const perpage = useRef(10);
+    const [isLoading, setIsLoading] = useState(false);
 
+    const getData = () => {
+        setIsLoading(true);
+        router.get(route('paramedis.screeningOnline'), {
+            perpage: perpage.current,
+        }, {
+            preserveScroll: true,
+            preserveState: true,
+            onFinish: () => setIsLoading(false),
+        });
+    };
+    const handleChangePerpage = (value: string) => {
+        perpage.current = parseInt(value, 10);
+        getData();
+    };
     return (
-        <Header user={auth.user}>
+        <ParamedisSidebar header={'Online Screening'}>
             <PageContainer scrollable={true}>
                 <Head title="Screening Online" />
-
+                <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} handleChangePerpage={handleChangePerpage} />
                 <Table>
                     <TableCaption>
                         List of Online Screening Entries
@@ -78,6 +95,6 @@ export default function HistoryOnline({ auth }: PageProps) {
                     </TableBody>
                 </Table>
             </PageContainer>
-        </Header>
+            </ParamedisSidebar>
     );
 }

@@ -19,7 +19,7 @@ import { Button } from "@/Components/ui/button";
 import { FileDown } from "lucide-react";
 import { Input } from "@/Components/ui/input";
 import type { PageProps } from "@/types";
-import Manager from "@/Layouts/ManagerLayout";
+import ManagerSidebar from "@/Layouts/Dashboard/ManagerSidebar";
 
 interface ReportFormData {
     periode: "today" | "weekly" | "monthly";
@@ -50,14 +50,14 @@ export default function ReportPeriodSelection({ auth }: PageProps) {
             periode: data.periode,
             start_date: data.start_date,
             end_date: data.end_date,
-            month: data.selected_month, // Kirim bulan
+            month: data.selected_month,
         });
 
         window.open(url, "_blank");
     };
 
     return (
-        <Manager user={auth.user}>
+        <ManagerSidebar header={'Report'}>
             <Head title="Report" />
             <section className="flex h-screen items-center justify-center">
                 <Card className="w-full max-w-md mx-auto">
@@ -162,6 +162,6 @@ export default function ReportPeriodSelection({ auth }: PageProps) {
                     </CardFooter>
                 </Card>
             </section>
-        </Manager>
+        </ManagerSidebar>
     );
 }

@@ -9,7 +9,6 @@ class OnlineRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      */
-
     public function authorize(): bool
     {
         return true;
@@ -22,19 +21,27 @@ class OnlineRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'full_name' => 'required|string|max:255',
-            'date_of_birth' => 'required|date',
-            'mountain' => 'required|string|max:255',
-            'citizenship' => 'required|string|max:255',
-            'country' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'phone' => 'required|string|max:15',
-            'email' => 'required|string|email|max:255',
-            'question1' => 'required|boolean',
-            'question2' => 'required|boolean',
-            'question3' => 'required|boolean',
-            'additional_notes' => 'nullable|string',
+            'age' => 'required|integer',
+            'gender' => 'required|string',
+            'email' => 'required|string',
+            'contact_number' => 'required|string|max:15',
+            'planned_hiking_date' => 'required|date',
+            'previous_hikes_count' => 'required|integer',
         ];
+        // Loop untuk kategori 'physical_health'
+        foreach (range(1, 6) as $index) {
+            $rules["physical_health_q{$index}"] = 'nullable|array';
+            $rules["physical_health_q{$index}.*"] = 'string';
+        }
+
+        // Loop untuk kategori 'experience_knowledge'
+        foreach (range(1, 5) as $index) {
+            $rules["experience_knowledge_q{$index}"] = 'nullable|array';
+            $rules["experience_knowledge_q{$index}.*"] = 'string';
+        }
+
+        return $rules;
     }
 }

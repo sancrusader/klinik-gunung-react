@@ -22,7 +22,7 @@ class CommunityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => 'required|string|max:1000',  
+            'content' => 'required|string|max:1000',
             'image_path' => 'nullable|image|max:2048',
         ];
     }

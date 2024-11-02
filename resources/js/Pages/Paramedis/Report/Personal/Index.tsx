@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Head } from "@inertiajs/react";
 import { UserIcon, LogInIcon, LogOutIcon } from "lucide-react";
+import ParamedisSidebar from "@/Layouts/Dashboard/ParamedisSidebar";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
 
 interface Activity {
     id: number;
@@ -12,6 +15,7 @@ interface Activity {
 interface Screening {
     id: number;
     full_name: string;
+    health_check_result: string;
     email: string;
     created_at: string;
 }
@@ -31,10 +35,8 @@ export default function Report({
     lastLogout,
     screenings,
 }: ReportProps) {
-
     const [searchQuery, setSearchQuery] = useState("");
 
-    // Filter screenings based on the search query
     const filteredScreenings = screenings.filter((screening) => {
         const fullNameMatch = screening.full_name
             .toLowerCase()
@@ -46,23 +48,24 @@ export default function Report({
     });
 
     const handleDownload = () => {
-        window.location.href = "/dashboard/paramedis/generate/report"; // Ubah URL sesuai route yang ditentukan
+        window.location.href = "/dashboard/paramedis/generate/report";
     };
 
     return (
+<ParamedisSidebar header={'My report'}>
         <div className="min-h-screen bg-gray-100">
             <Head title="Laporan Aktivitas" />
             <div className="container mx-auto px-4 py-8">
                 <h1 className="text-3xl font-bold mb-8 text-gray-800">
-                    Laporan Aktivitas Saya
+                    Laporan Screening
                 </h1>
 
-                <button
+                <Button
                     onClick={handleDownload}
-                    className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
+                    className="mb-4 px-4 py-2 text-white rounded"
                 >
                     Download Report
-                </button>
+                </Button>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                     <StatCard
@@ -92,10 +95,10 @@ export default function Report({
 
                 {/* Input Pencarian */}
                 <div className="mb-4">
-                    <input
+                    <Input
                         type="text"
                         placeholder="Cari berdasarkan nama atau email..."
-                        className="p-2 border border-gray-300 rounded"
+                        className="p-2"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -118,6 +121,9 @@ export default function Report({
                                         Email
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Status Kesehatan
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Tanggal
                                     </th>
                                 </tr>
@@ -135,6 +141,10 @@ export default function Report({
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 {screening.email}
                                             </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {screening.health_check_result ?? 'N/A'}
+                                                </td>
+
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 {new Date(
                                                     screening.created_at
@@ -158,6 +168,7 @@ export default function Report({
                 </div>
             </div>
         </div>
+        </ParamedisSidebar>
     );
 }
 
@@ -171,7 +182,7 @@ function StatCard({ icon, title, value }: StatCardProps) {
     return (
         <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center mb-4">
-                <div className="bg-blue-100 rounded-full p-3 mr-4">{icon}</div>
+                <div className="mr-4">{icon}</div>
                 <h3 className="text-lg font-semibold text-gray-700">{title}</h3>
             </div>
             <p className="text-2xl font-bold text-gray-900">{value}</p>

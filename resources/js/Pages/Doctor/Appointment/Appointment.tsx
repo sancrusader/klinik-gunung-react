@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { usePage, router, Link, Head } from "@inertiajs/react";
-import DoctorLayout from "@/Layouts/DoctorLayout";
+import DoctorSidebar from "@/Layouts/Dashboard/DoctorSidebar";
 import { PageProps } from "@/types";
 import { Button } from "@/Components/ui/button";
 import {
@@ -17,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
 import { CalendarIcon, ClipboardIcon, UserIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
+import PageContainer from "@/Layouts/PageContainer";
 
 interface Appointment {
     id: number;
@@ -85,9 +86,9 @@ export default function DoctorAppointments({ auth }: Props) {
     };
 
     return (
-        <>
+        <DoctorSidebar header={'Appointments'}>
         <Head title='Appointments'/>
-        <DoctorLayout user={auth.user}>
+            <PageContainer>
             <div className="container mx-auto py-10">
                 {notification && (
                     <Alert className="mb-4">
@@ -218,7 +219,7 @@ export default function DoctorAppointments({ auth }: Props) {
                     </CardContent>
                 </Card>
             </div>
-            </DoctorLayout>
-            </>
+            </PageContainer>
+            </DoctorSidebar>
     );
 }

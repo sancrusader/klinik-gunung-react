@@ -1,7 +1,6 @@
 // Halaman MedicalRecordPage.tsx
 import React from "react";
 import MedicalRecordDetail from "@/Components/MedicalRecordDetail";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 
 // types/MedicalRecord.ts
 export interface MedicalRecord {

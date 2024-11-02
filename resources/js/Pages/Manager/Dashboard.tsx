@@ -1,19 +1,11 @@
-import ManagerLayout from "@/Layouts/ManagerLayout";
 import { Head } from "@inertiajs/react";
 import { PageProps } from "@/types";
-
+import ManagerSidebar from "@/Layouts/Dashboard/ManagerSidebar";
 export const description = "A stacked area chart";
 
 export default function Dashboard({ auth }: PageProps) {
     return (
-        <ManagerLayout
-            user={auth.user}
-            header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Dashboard
-                </h2>
-            }
-        >
+        <ManagerSidebar header={'Manager Dashboard'}>
             <Head title="Dashboard" />
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -24,6 +16,6 @@ export default function Dashboard({ auth }: PageProps) {
                     </div>
                 </div>
             </div>
-        </ManagerLayout>
+        </ManagerSidebar>
     );
 }

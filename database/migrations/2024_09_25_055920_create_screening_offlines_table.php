@@ -14,16 +14,19 @@ return new class extends Migration
         Schema::create('screening_offlines', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable();
+            $table->uuid('uuid')->unique()->nullable();
             $table->unsignedBigInteger('paramedic_id')->nullable();
             $table->foreign('paramedic_id')->references('id')->on('users')->onDelete('set null');
             $table->unsignedBigInteger('doctor_id')->nullable();
             $table->foreign('doctor_id')->references('id')->on('users')->onDelete('set null');
+            $table->boolean('isOnline')->default(false);
             $table->string('full_name');
             $table->string('email')->unique();
             $table->integer('queue_number')->unique();
             $table->integer('age')->nullable();
             $table->enum('gender', ['male', 'female', 'other'])->nullable();
             $table->string('contact_number')->nullable();
+            $table->enum('status', ['completed', 'pending', 'cancelled'])->nullable();
             $table->date('planned_hiking_date')->nullable();
             $table->integer('previous_hikes_count')->nullable();
             $table->string('physical_health_q1')->nullable();
@@ -52,6 +55,7 @@ return new class extends Migration
             $table->timestamps();
         });
     }
+
     public function down(): void
     {
         Schema::dropIfExists('screening_offlines');

@@ -3,9 +3,8 @@
 namespace App\Models\Screening;
 
 use App\Models\User;
-use App\Models\Screening\Payments;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Offline extends Model
 {
@@ -14,10 +13,13 @@ class Offline extends Model
     protected $table = 'screening_offlines';
 
     // Kolom yang dapat diisi (mass-assignable)
-       protected $fillable = [
+    protected $fillable = [
         'user_id',
+        'uuid',
         'paramedic_id',
+        'status',
         'doctor_id',
+        'status',
         'full_name',
         'email',
         'queue_number',
@@ -49,7 +51,9 @@ class Offline extends Model
         'is_recommended_for_hiking',
         'not_recommended_reason',
         'medical_recommendations',
+        'is_online',
     ];
+
     protected $casts = [
         'health_check_result' => 'string',
         'payment_status' => 'boolean',
@@ -59,12 +63,13 @@ class Offline extends Model
     public static function generateQueueNumber()
     {
         $lastQueueNumber = self::max('queue_number');
+
         return $lastQueueNumber ? $lastQueueNumber + 1 : 1;
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id'); // Asumsikan ada user_id di ScreeningOffline
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function paramedis()
@@ -77,4 +82,13 @@ class Offline extends Model
         return $this->hasOne(Payments::class, 'screening_id');
     }
 
+    public function uuid()
+    {
+        return $this->belongsTo(User::class, 'uuid', 'uuid');
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payments::class, 'screening_id');
+    }
 }

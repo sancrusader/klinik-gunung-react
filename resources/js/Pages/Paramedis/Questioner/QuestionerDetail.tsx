@@ -1,11 +1,10 @@
 import React from "react";
 import { Head } from "@inertiajs/react";
-import HeaderParamedis from "@/Layouts/HeaderParamedis";
 import PageContainer from "@/Layouts/PageContainer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { PageProps } from "@/types";
 import { Screening } from "@/types/screening";
-
+import ParamedisSidebar from "@/Layouts/Dashboard/ParamedisSidebar";
 function capitalizeName(name: string): string {
     return name
         .toLowerCase()
@@ -28,14 +27,7 @@ export default function QuestionerDetail({
     questions,
 }: Props) {
     return (
-        <HeaderParamedis
-            user={auth.user}
-            header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Screening Offline
-                </h2>
-            }
-        >
+<ParamedisSidebar header={'Kuesioner Detail'}>
             <PageContainer>
                 <Head title="Screening Offline" />
                 <div className="py-12">
@@ -93,6 +85,6 @@ export default function QuestionerDetail({
                     </div>
                 </div>
             </PageContainer>
-        </HeaderParamedis>
+        </ParamedisSidebar>
     );
 }

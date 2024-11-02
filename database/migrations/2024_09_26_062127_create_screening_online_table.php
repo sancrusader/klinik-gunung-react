@@ -14,31 +14,43 @@ class CreateScreeningOnlineTable extends Migration
     public function up()
     {
         Schema::create('screening_online', function (Blueprint $table) {
-            $table->id(); // id utama, auto-increment
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // foreign key ke tabel users
-            $table->string('full_name'); // nama lengkap
-            $table->date('date_of_birth'); // tanggal lahir
-            $table->string('mountain'); // informasi tambahan
-            $table->string('citizenship'); // kewarganegaraan
-            $table->string('country'); // negara
-            $table->string('address'); // alamat
-            $table->string('phone'); // nomor telepon
-            $table->string('email'); // alamat email
-            $table->tinyInteger('question1')->default(0); // pertanyaan 1
-            $table->tinyInteger('question2')->default(0); // pertanyaan 2
-            $table->tinyInteger('question3')->default(0); // pertanyaan 3
-            $table->text('additional_notes')->nullable(); // catatan tambahan
-            $table->string('queue_number')->nullable(); // nomor antrean
+            $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->uuid('uuid')->unique()->nullable();
+            $table->unsignedBigInteger('paramedic_id')->nullable();
+            $table->foreign('paramedic_id')->references('id')->on('users')->onDelete('set null');
+            $table->unsignedBigInteger('doctor_id')->nullable();
+            $table->foreign('doctor_id')->references('id')->on('users')->onDelete('set null');
+            $table->boolean('isOnline')->default(true);
+            $table->string('full_name');
+            $table->string('email')->unique();
+            $table->integer('queue_number')->unique();
+            $table->integer('age')->nullable();
+            $table->enum('gender', ['male', 'female', 'other'])->nullable();
+            $table->string('contact_number')->nullable();
+            $table->enum('status', ['completed', 'pending', 'cancelled'])->nullable();
+            $table->date('planned_hiking_date')->nullable();
+            $table->integer('previous_hikes_count')->nullable();
+            $table->string('physical_health_q1')->nullable();
+            $table->string('physical_health_q2')->nullable();
+            $table->string('physical_health_q3')->nullable();
+            $table->string('physical_health_q4')->nullable();
+            $table->string('physical_health_q5')->nullable();
+            $table->string('physical_health_q6')->nullable();
+            $table->string('experience_knowledge_q1')->nullable();
+            $table->string('experience_knowledge_q2')->nullable();
+            $table->string('experience_knowledge_q3')->nullable();
+            $table->string('experience_knowledge_q4')->nullable();
+            $table->string('experience_knowledge_q5')->nullable();
+            $table->boolean('payment_status')->default(false);
             $table->text('qr_code')->nullable(); // QR code
-            $table->tinyInteger('screening_passed')->default(0); // status lolos screening
-            $table->timestamps(); // created_at dan updated_at
-            $table->string('status')->default('pending'); // status screening
-            $table->string('qr_code_url')->nullable(); // URL QR code
-            $table->enum('payment_status', ['pending', 'paid'])->default('pending'); // status pembayaran
-            $table->tinyInteger('certificate_issued')->default(0); // sertifikat diterbitkan
-            $table->string('certificate_path')->nullable(); // path sertifikat
-            $table->tinyInteger('payment_confirmed')->default(0); // pembayaran terkonfirmasi
-            $table->tinyInteger('qr_code_sent')->default(0); // QR code dikirim
+            $table->tinyInteger('screening_passed')->default(0);
+            $table->timestamps();
+            $table->string('qr_code_url')->nullable();
+            $table->tinyInteger('certificate_issued')->default(0);
+            $table->string('certificate_path')->nullable();
+            $table->tinyInteger('payment_confirmed')->default(0);
+            $table->tinyInteger('qr_code_sent')->default(0);
         });
     }
 

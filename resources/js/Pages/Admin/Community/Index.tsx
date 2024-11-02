@@ -1,6 +1,12 @@
 import { PageProps } from "@/types";
-import { useForm } from "@inertiajs/react";
+import { useForm, router } from "@inertiajs/react";
 import { Toaster, toast } from "sonner";
+import AdminSidebar from "@/Layouts/Dashboard/AdminSidebar";
+import { Card, CardContent, CardFooter, CardHeader } from "@/Components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
+import { Button } from "@/Components/ui/button";
+import { Badge } from "@/Components/ui/badge";
+import { Head } from "@inertiajs/react";
 
 export default function Index({
     auth,
@@ -15,10 +21,14 @@ export default function Index({
         created_at: string;
     }[];
 }>) {
-
     // Form untuk mengizinkan postingan
     const { post: approvePost } = useForm({
         status: "approve",
+    });
+
+    // Form untuk menolak postingan
+    const { post: rejectPost } = useForm({
+        status: "reject",
     });
 
     // Handle izin postingan
@@ -35,33 +45,63 @@ export default function Index({
         }
     };
 
+    // Handle menolak postingan
+
+    // Handle menghapus postingan
+    const handleDelete = (id: number) => {
+        if (confirm("Apakah Anda yakin ingin menghapus postingan ini?")) {
+            // Menggunakan metode delete
+            router.delete(route("community.destroy", { id }), {
+                onSuccess: () => {
+                    toast.success("Postingan telah dihapus!");
+                },
+                onError: () => {
+                    toast.error("Gagal menghapus postingan.");
+                }
+            });
+        }
+    };
+
     return (
-        <>
+        <AdminSidebar header={'Community'}>
+            <Head title="Community List" />
             <Toaster />
-            <div className="community-list">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {communityPosts?.map((post) => (
-                    <div key={post.id} className="post-item border p-4 mb-4">
-                        <div className="flex items-center mb-2">
-                            <img src={`/storage/${post.user.avatar}`} alt="Avatar" className="w-10 h-10 rounded-full mr-3" />
-                            <span className="font-bold">{post.user.name}</span>
-                        </div>
-                        <div className="content mb-2">{post.content}</div>
-                        <div className="status mb-2">
-                            <span className={`status-${post.status === 'terima' ? 'approved' : 'pending'}`}>
-                                Status: {post.status === 'terima' ? 'Diterima' : 'Pending'}
-                            </span>
-                        </div>
-                        {post.status === 'pending' && (
-                            <button
-                                className="bg-blue-500 text-white py-1 px-3 rounded"
-                                onClick={() => handleApprove(post.id)}
-                            >
-                                Izinkan
-                            </button>
-                        )}
-                    </div>
+                    <Card key={post.id}>
+                        <CardHeader className="flex flex-row items-center gap-4">
+                            <Avatar>
+                                <AvatarImage src={`/storage/${post.user.avatar}`} alt={post.user.name} />
+                                <AvatarFallback>{post.user.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <h3 className="font-semibold">{post.user.name}</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    {new Date(post.created_at).toLocaleDateString()}
+                                </p>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <p>{post.content}</p>
+                        </CardContent>
+                        <CardFooter className="flex justify-between">
+                            <Badge variant={post.status === 'approve' ? 'default' : 'secondary'}>
+                                {post.status === 'approve' ? 'Diterima' : 'Pending'}
+                            </Badge>
+                            {post.status === 'pending' && (
+                                <>
+                                    <Button onClick={() => handleApprove(post.id)}>
+                                        Izinkan
+                                    </Button>
+                                </>
+                            )}
+                            <Button onClick={() => handleDelete(post.id)} variant="destructive">
+                                Hapus
+                            </Button>
+                        </CardFooter>
+                    </Card>
                 ))}
             </div>
-        </>
+        </AdminSidebar>
     );
 }

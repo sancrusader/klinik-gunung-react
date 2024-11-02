@@ -2,21 +2,20 @@
 
 namespace App\Http\Controllers\Clinic;
 
-use App\Models\User;
-use Inertia\Inertia;
-use Illuminate\Http\Request;
-use App\Models\Emergency\Emergency;
 use App\Http\Controllers\Controller;
+use App\Models\Emergency\Emergency;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class EmergencyController extends Controller
 {
-
     public function create()
     {
         return Inertia::render('Patients/Emergency/Index', [
-        'coordinators' => $coordinators = User::where('role', 'cordi')->get(),
-    ]);
+            'coordinators' => $coordinators = User::where('role', 'cordi')->get(),
+        ]);
     }
 
     public function store(Request $request)
@@ -34,7 +33,6 @@ class EmergencyController extends Controller
         return redirect()->route('emergency')->with('success', 'An emergency call has been sent to the coordinator.');
     }
 
-
     public function updateStatus($id, $status)
     {
         $call = Emergency::findOrFail($id);
@@ -43,13 +41,14 @@ class EmergencyController extends Controller
 
         return redirect()->route('cordi.emergency');
     }
+
     // Menampilkan panggilan darurat
     public function show()
     {
         $emergencies = Emergency::with(['patient', 'cordi'])
             ->where('patients_id', Auth::id()) // Mengambil emergency yang terkait dengan pasien yang sedang login
             ->get()
-            ->map(function($emergency) {
+            ->map(function ($emergency) {
                 return [
                     'id' => $emergency->id,
                     'patients_name' => $emergency->patient->name,
@@ -61,5 +60,4 @@ class EmergencyController extends Controller
 
         return Inertia('Patients/Emergency/History', compact('emergencies'));
     }
-
 }

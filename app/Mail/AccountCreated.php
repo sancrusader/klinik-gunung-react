@@ -12,6 +12,7 @@ class AccountCreated extends Mailable
     use Queueable, SerializesModels;
 
     public $user;
+
     public $password;
 
     /**
@@ -29,10 +30,10 @@ class AccountCreated extends Mailable
     public function build()
     {
         return $this->view('emails.account_created')
-                    ->with([
-                        'name' => $this->user->name,
-                        'email' => $this->user->email,
-                        'password' => $this->password,
-                    ]);
+            ->with([
+                'name' => $this->user->name,
+                'email' => $this->user->email,
+                'password' => $this->password,
+            ]);
     }
 }

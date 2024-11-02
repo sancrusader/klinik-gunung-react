@@ -2,21 +2,22 @@
 
 namespace App\Http\Controllers\Ecommerce;
 
-use Inertia\Inertia;
-use Illuminate\Http\Request;
-use App\Models\Ecommerce\Cart;
-use App\Models\Ecommerce\Order;
-use App\Models\Ecommerce\Product;
-use App\Models\Ecommerce\Category;
-use App\Models\Ecommerce\OrderItem;
 use App\Http\Controllers\Controller;
+use App\Models\Ecommerce\Cart;
+use App\Models\Ecommerce\Category;
+use App\Models\Ecommerce\Order;
+use App\Models\Ecommerce\OrderItem;
+use App\Models\Ecommerce\Product;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class ProductController extends Controller
 {
     public function index(Request $request)
     {
         $products = Product::all();
+
         return Inertia::render('Ecommerce/Index', [
             'products' => $products,
         ]);
@@ -59,6 +60,7 @@ class ProductController extends Controller
     public function edit($id)
     {
         $product = Product::findOrFail($id);
+
         return view('admin.products.edit', compact('product'));
     }
 
@@ -101,7 +103,6 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully!');
     }
 
-
     public function addToCart(Request $request, $id)
     {
         $product = Product::findOrFail($id);
@@ -127,7 +128,6 @@ class ProductController extends Controller
 
         return redirect()->back()->with('success', 'Product added to cart successfully!');
     }
-
 
     public function showCart()
     {

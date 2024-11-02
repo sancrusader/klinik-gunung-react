@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('cashier_id')->nullable();
+            $table->foreign('cashier_id')->references('id')->on('users')->onDelete('set null');
             $table->unsignedBigInteger('screening_id')->nullable();
             $table->foreign('screening_id')->references('id')->on('screening_offlines')->onDelete('cascade');
             $table->boolean('payment_status')->default(false);
             $table->decimal('amount_paid', 10, 2)->nullable();
             $table->string('payment_method')->nullable();
             $table->integer('quantity_product')->nullable();
-            $table->decimal('price_product',10, 2)->nullable();
+            $table->decimal('price_product', 10, 2)->nullable();
             $table->string('payment_proof')->nullable();
             $table->timestamps();
         });

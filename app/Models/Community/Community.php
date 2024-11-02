@@ -3,8 +3,8 @@
 namespace App\Models\Community;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Community extends Model
 {
@@ -12,15 +12,15 @@ class Community extends Model
 
     protected $fillable = [
         'user_id',
+        'username',
+        'bio',
         'content',
-        'image_path',
-        'statuts',
+        'image',
+        'status',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-
-
 }

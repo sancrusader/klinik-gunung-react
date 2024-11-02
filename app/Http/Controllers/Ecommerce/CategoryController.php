@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers\Ecommerce;
 
-use Inertia\Inertia;
-use Illuminate\Http\Request;
-use App\Models\Ecommerce\Category;
 use App\Http\Controllers\Controller;
+use App\Models\Ecommerce\Category;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CategoryController extends Controller
 {
     public function index()
     {
         $categories = Category::paginate(10);
+
         return view('admin.categories.index', compact('categories'));
     }
 
@@ -30,13 +31,12 @@ class CategoryController extends Controller
             'name' => $request->name,
         ]);
 
-        return;
     }
-
 
     public function edit($id)
     {
         $category = Category::findOrFail($id);
+
         return view('admin.categories.edit', compact('category'));
     }
 
@@ -46,7 +46,7 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
 
         $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
+            'name' => 'required|string|max:255|unique:categories,name,'.$category->id,
         ]);
 
         $category->update([

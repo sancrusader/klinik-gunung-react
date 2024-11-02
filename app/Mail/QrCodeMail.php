@@ -11,6 +11,7 @@ class QrCodeMail extends Mailable
     use Queueable, SerializesModels;
 
     public $user;
+
     public $qrCodeUrl;
 
     /**

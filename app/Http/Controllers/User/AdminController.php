@@ -2,22 +2,35 @@
 
 namespace App\Http\Controllers\user;
 
-use App\Models\User;
-use Inertia\Inertia;
-use Illuminate\Http\Request;
-use App\Models\Screening\Scan;
-use App\Models\Community\Community;
 use App\Http\Controllers\Controller;
+use App\Models\Community\Community;
+use App\Models\Screening\Scan;
+use App\Models\User;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Validator;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class AdminController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         return Inertia::render('Admin/Dashboard');
     }
 
-    public function scan(){
+    // Page Profile Admin
+    public function profile(Request $request): Response
+    {
+        return Inertia::render('Profile/Admin', [
+            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'status' => session('status'),
+        ]);
+    }
+
+    // Scan Qr Code Online Screening
+    public function scan()
+    {
         return view('scan');
     }
 
@@ -52,9 +65,12 @@ class AdminController extends Controller
         return redirect()->route('admin.scan');
     }
 
-    public function Community(){
+    // Function Community Menyetujui Postingan
+    public function Community()
+    {
 
         $community = Community::all();
+
         return Inertia::render('Admin/Community/Index', [
 
         ]);
@@ -65,7 +81,8 @@ class AdminController extends Controller
         return Inertia::render('Admin/Users/Index');
     }
 
-    public function addUsers(){
+    public function addUsers()
+    {
         return Inertia::render('Admin/Users/Create');
     }
 
@@ -88,5 +105,4 @@ class AdminController extends Controller
 
         return redirect()->back()->with('success', 'User added successfully.');
     }
-
 }

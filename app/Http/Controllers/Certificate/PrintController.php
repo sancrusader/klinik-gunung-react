@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers\Certificate;
 
-use Barryvdh\DomPDF\Facade\Pdf as PDF;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
 class PrintController extends Controller
 {

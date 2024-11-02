@@ -1,5 +1,5 @@
 import { Head } from "@inertiajs/react";
-import DoctorLayout from "@/Layouts/DoctorLayout";
+import DoctorSidebar from "@/Layouts/Dashboard/DoctorSidebar";
 import PageContainer from "@/Layouts/PageContainer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { PageProps } from "@/types";
@@ -27,16 +27,9 @@ export default function QuestionerDetail({
     questions,
 }: Props) {
     return (
-        <DoctorLayout
-            user={auth.user}
-            header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Screening Offline
-                </h2>
-            }
-        >
+        <DoctorSidebar header={'Offline Screening'}>
             <PageContainer>
-                <Head title="Screening Offline" />
+                <Head title="Detail Questioner" />
                 <div className="py-12">
                     <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                         <Card>
@@ -92,6 +85,6 @@ export default function QuestionerDetail({
                     </div>
                 </div>
             </PageContainer>
-        </DoctorLayout>
+        </DoctorSidebar>
     );
 }

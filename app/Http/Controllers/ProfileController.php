@@ -21,7 +21,6 @@ class ProfileController extends Controller
         return Inertia::render('Notification/Notif');
     }
 
-
     public function edit(Request $request): Response
     {
         return Inertia::render('Profile/Edit', [
@@ -33,7 +32,7 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request)
     {
         $validatedData = $request->validated();
 
@@ -53,9 +52,8 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return Redirect::route('profile.edit');
+        return back()->with('success', 'Profile Berhasil Di Perbaharui');
     }
-
 
     /**
      * Delete the user's account.

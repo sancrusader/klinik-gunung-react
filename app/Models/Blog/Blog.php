@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Blog extends Model
 {
     use HasFactory;
+
     // Tentukan kolom yang dapat diisi massal
     protected $fillable = [
         'title',

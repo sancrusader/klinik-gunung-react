@@ -2,41 +2,59 @@
 
 namespace App\Http\Controllers\Screening;
 
-use Inertia\Inertia;
-use Illuminate\Http\Request;
-use App\Models\Screening\Offline;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Screening\OfflineRequest;
+use App\Http\Resources\ScreeningResource;
+use App\Models\Screening\Offline;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Inertia\Inertia;
+use App\Helpers\ScreeningOfflineHelper;
 
 class OfflineController extends Controller
 {
+    // Index fomr Screening Offline
     public function index()
     {
-        // Caching questions for better performance
-        $questions = $this->getCachedScreeningQuestions();
+        $userId = Auth::id();
+
+        $hasScreening = Offline::where('user_id', $userId)->exists();
+
+        if ($hasScreening) {
+            return redirect()->route('history.screening.offline')->with('error', 'Anda sudah melakukan screening offline.');
+        }
+        $questions = ScreeningOfflineHelper::getScreeningQuestions();
+
         return Inertia::render('Screening/Offline', [
             'questions' => $questions,
         ]);
     }
 
-    private function generateQueueNumber()
+
+    // Menampilkan History Screening Offline Pasien
+    public function show()
     {
-        // Using DB raw query for faster performance on large datasets
-        return Offline::max('queue_number') + 1;
+        $userId = Auth::user()->id;
+
+        $screening = Offline::where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        return Inertia::render('Patients/Screening/HistoryOffline', [
+            'screening' => $screening,
+        ]);
     }
 
+    // Pasien melakukan screening
     public function store(OfflineRequest $request)
     {
-        // Caching user ID to reduce database queries
         $userId = Auth::id();
 
-        // Generate queue number with caching for quick access
         $queueNumber = $this->generateQueueNumber();
 
-        // Bulk insert for better efficiency
         $screeningOffline = Offline::create([
+            'status' => 'pending',
             'queue_number' => $queueNumber,
             'full_name' => $request->full_name,
             'email' => $request->email,
@@ -48,7 +66,6 @@ class OfflineController extends Controller
             'previous_hikes_count' => $request->previous_hikes_count,
         ]);
 
-        // Collect all the answers in a single batch update
         $updateData = [];
         foreach (range(1, 6) as $index) {
             $field = "physical_health_q{$index}";
@@ -63,50 +80,31 @@ class OfflineController extends Controller
         // Perform batch update to minimize queries
         $screeningOffline->update($updateData);
 
-        return back()->with('success', 'Pendaftaran berhasil dan data kuisioner berhasil disimpan, nomor antrian: ' . $queueNumber);
+        return back()->with('success', 'Pendaftaran berhasil dan data kuisioner berhasil disimpan, nomor antrian: '.$queueNumber);
     }
-
-    // Menampilkan data ke paramedis
-    public function showScreeningOffline()
+    // Membuat Nomor Antrian
+    private function generateQueueNumber()
     {
-        $screenings = Offline::paginate(10);
+        return Offline::max('queue_number') + 1;
+    }
+    public function showScreeningOffline(Request $request)
+    {
+        $validatedData = $request->validate([
+            'perpage' => 'sometimes|nullable|integer|min:1|max:100',
+        ]);
+
+        $perpage = $validatedData['perpage'] ?? 10;
+
+        // Menambahkan kondisi untuk tidak menampilkan pasien dengan penyakit jantung
+        $screenings = Offline::whereNull('health_check_result')
+            ->where('physical_health_q1', '!=', 'penyakit jantung')
+            ->paginate($perpage);
+
         return Inertia::render('Paramedis/Screening/Offline', [
-            'screenings' => $screenings,
+            'screenings' => ScreeningResource::collection($screenings),
+            'pagination_links' => $screenings->links()->render(),
         ]);
     }
 
-    // Menampilkan riwayat untuk pasien
-    public function show()
-    {
-        $userId = Auth::user()->id;
 
-        // Paginate the screening data for better performance
-        $screenings = Offline::where('user_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);  // Adjust page size as needed
-
-        return Inertia::render('Patients/Screening/HistoryOffline', [
-            'screenings' => $screenings,
-        ]);
-    }
-
-    private function getCachedScreeningQuestions()
-    {
-        // Cache questions for better performance (cache expires in 1 hour)
-        return Cache::remember('screening_questions', 3600, function () {
-            return [
-                'physical_health_q1' => 'Apakah Anda memiliki riwayat penyakit berikut ini?',
-                'physical_health_q2' => 'Kapan terakhir kali Anda Melakukan Pemeriksaan kesehatan umum?',
-                'physical_health_q3' => 'Apakah Anda memiliki masalah dengan:',
-                'physical_health_q4' => 'Apakah Anda sedang dalam pengobatan rutin atau menggunakan obat tertentu? jika ya, sebutkan:',
-                'physical_health_q5' => 'Bagaimana Anda menilai kondisi fisik Anda saat ini untuk pendakian (misal: kekuatan otot, keseimbangan, stamina)?',
-                'physical_health_q6' => 'Apakah Anda memiliki alergi (terhadap makanan, obat, atau lainnya)? Jika Ya, Sebutkan:',
-                'experience_knowledge_q1' => 'Apakah Anda pernah mendaki Gunung Semeru sebelumnya?',
-                'experience_knowledge_q2' => 'Apakah Anda pernah mengalami Altitude Sickness (mabuk ketinggian)?',
-                'experience_knowledge_q3' => 'Apakah Anda mengetahui cara menangani situasi darurat seperti hipotermia, dehidrasi, atau cedera selama pendakian?',
-                'experience_knowledge_q4' => 'Apakah Anda membawa atau tahu cara menggunakan perlengkapan berikut? (Centang semua yang sesuai)?',
-                'experience_knowledge_q5' => 'Bagaimana persiapan Anda menghadapi perubahan cuaca di Gunung Semeru?',
-            ];
-        });
-    }
 }

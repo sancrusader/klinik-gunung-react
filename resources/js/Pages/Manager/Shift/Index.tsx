@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/Components/ui/button"
 import { Label } from "@/Components/ui/label"
-import ManagerLayout from "@/Layouts/ManagerLayout"
+import ManagerSidebar from "@/Layouts/Dashboard/ManagerSidebar"
 import {
   Select,
   SelectContent,
@@ -79,7 +79,7 @@ export default function AddScheduleComponent({ staff }: AddScheduleProps) {
   }
 
   return (
-    <>
+    <ManagerSidebar header={'Shift'}>
     <Head title="Shiff"/>
     <div className="py-12">
       <Toaster position="top-center" />
@@ -156,6 +156,6 @@ export default function AddScheduleComponent({ staff }: AddScheduleProps) {
         </form>
       </div>
     </div>
-    </>
+    </ManagerSidebar>
   )
 }

@@ -1,6 +1,5 @@
 import React from "react";
 import { PageProps } from "@/types";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { usePage, Head, Link } from "@inertiajs/react";
 import {
     Table,
@@ -15,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { CalendarIcon, PlusIcon, SearchIcon, UserIcon } from "lucide-react";
-
+import AppSidebar from "@/Layouts/Dashboard/Sidebar";
 interface Appointment {
     id: number;
     scheduled_at: string | null;
@@ -34,14 +33,7 @@ export default function OfflineList({ auth }: Props) {
     const { appointments = [] } = usePage<Props>().props;
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Appointment List
-                </h2>
-            }
-        >
+        <AppSidebar header={'Appointments List'}>
             <Head title="Appointment List" />
 
             <div className="py-12">
@@ -114,6 +106,6 @@ export default function OfflineList({ auth }: Props) {
                     </Card>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AppSidebar>
     );
 }

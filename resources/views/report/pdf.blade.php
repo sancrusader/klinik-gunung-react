@@ -38,8 +38,14 @@
     </h1>
 
     <p>Periode:
-        {{ $periode === 'today' ? 'Hari Ini' : ($periode === 'weekly' ? 'Dari ' . \Carbon\Carbon::parse($start_date)->format('d-m-Y') . ' hingga ' . \Carbon\Carbon::parse($end_date)->format('d-m-Y') : 'Bulan: ' . \Carbon\Carbon::parse($start_date)->format('F Y')) }}
-    </p>
+    @if($periode === 'today')
+        Hari Ini: {{ \Carbon\Carbon::now()->format('d-m-Y') }}
+    @elseif($periode === 'weekly')
+        Dari {{ \Carbon\Carbon::parse($start_date)->format('d-m-Y') }} hingga {{ \Carbon\Carbon::parse($end_date)->format('d-m-Y') }}
+    @else
+        Bulan: {{ \Carbon\Carbon::parse($start_date)->format('F Y') }}
+    @endif
+</p>
     <p>Total Screening Offline: {{ $totalScreeningOffline }}</p>
     <p>Total Uang Masuk: Rp {{ number_format($totalUangMasuk, 0, ',', '.') }}</p>
 

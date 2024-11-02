@@ -18,9 +18,12 @@ return new class extends Migration
             $table->string('avatar')->nullable();
             $table->string('email')->unique();
             $table->enum('role', ['admin', 'paramedis', 'cashier', 'doctor', 'manager', 'cordi', 'patients']) // Tambahkan 'patients' di sini
-          ->default('patients'); // Set nilai default yang benar
+                ->default('patients');
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
+            $table->string('provider')->nullable();
+            $table->string('provider_id')->nullable();
+            $table->string('provider_token')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

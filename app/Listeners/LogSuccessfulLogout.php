@@ -2,10 +2,8 @@
 
 namespace App\Listeners;
 
-use Illuminate\Support\Carbon;
 use App\Models\Activity\UserActivity;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Carbon;
 
 class LogSuccessfulLogout
 {

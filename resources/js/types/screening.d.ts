@@ -3,9 +3,9 @@ export interface Screening {
     full_name: string;
     paramedic_id: number;
     paramedis: {
-        // Ubah dari paramedic_id ke paramedic object
         name: string;
     };
+    email: string;
     doctor_id: number;
     queue_number: number;
     age: number;
@@ -34,23 +34,6 @@ export interface Screening {
     is_recommended_for_hiking?: boolean;
     not_recommended_reason?: string;
     medical_recommendations?: string;
-}
-
-export interface ScreeningOnline {
-    id: number;
-    full_name: string;
-    queue_number: number | null;
-    date_of_birth: string;
-    citizenship: string;
-    country: string;
-    address: string;
-    mountain: string;
-    phone: number;
-    email: string;
-    payment_confirmed: boolean;
-    status: string;
-    question1: string;
-    question2: string;
-    question3: string;
-    health_check_result: string;
+    created_at: string;
+    status: 'completed' | 'pending' | 'cancelled';
 }

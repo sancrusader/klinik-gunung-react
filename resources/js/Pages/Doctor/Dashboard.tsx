@@ -1,4 +1,4 @@
-import DoctorLayout from "@/Layouts/DoctorLayout";
+import DoctorSidebar from "@/Layouts/Dashboard/DoctorSidebar";
 import { Head } from "@inertiajs/react";
 import { PageProps } from "@/types";
 
@@ -6,14 +6,7 @@ export const description = "A stacked area chart";
 
 export default function Dashboard({ auth }: PageProps) {
     return (
-        <DoctorLayout
-            user={auth.user}
-            header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Dashboard Doctor
-                </h2>
-            }
-        >
+        <DoctorSidebar header={'Doctor Dashboard'}>
             <Head title="Dashboard" />
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -24,6 +17,6 @@ export default function Dashboard({ auth }: PageProps) {
                     </div>
                 </div>
             </div>
-        </DoctorLayout>
+        </DoctorSidebar>
     );
 }

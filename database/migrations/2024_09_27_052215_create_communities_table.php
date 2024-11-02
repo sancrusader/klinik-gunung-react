@@ -10,8 +10,10 @@ class CreatecommunitiesTable extends Migration
     {
         Schema::create('communities', function (Blueprint $table) {
             $table->id();
+            $table->string('bio')->nullable();
+            $table->string('username')->unique()->nullable();
             $table->text('content')->nullable();
-            $table->string('image_path')->nullable();
+            $table->string('image')->nullable();
             $table->string('status')->default('pending');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();

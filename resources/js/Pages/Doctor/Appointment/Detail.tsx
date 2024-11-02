@@ -1,7 +1,5 @@
-// Halaman MedicalRecordPage.tsx
-import React from "react";
 import MedicalRecordDetail from "@/Components/MedicalRecordDetail";
-// types/MedicalRecord.ts
+import DoctorSidebar from "@/Layouts/Dashboard/DoctorSidebar";
 export interface MedicalRecord {
     id: number;
     medical_notes: string;
@@ -12,11 +10,13 @@ export interface MedicalRecord {
 export default function MedicalRecordPage({
     record,
 }: {
-    record: MedicalRecord; // Gunakan tipe yang diimpor
+    record: MedicalRecord;
 }) {
     return (
+        <DoctorSidebar header={'Medical Record'}>
         <div className="py-12">
             <MedicalRecordDetail record={record} />
         </div>
+        </DoctorSidebar>
     );
 }

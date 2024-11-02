@@ -2,41 +2,94 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Helpers\ScreeningOfflineHelper;
 use Inertia\Inertia;
+use Inertia\Response;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use App\Models\Screening\Online;
 use App\Models\Screening\Offline;
+use App\Http\Controllers\Controller;
+use Illuminate\Auth\MustVerifyEmail;
+use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class PatientController extends Controller
 {
-    public function index(){
-        return Inertia::render('Dashboard');
+    use AuthorizesRequests;
+
+    public function index()
+    {
+        $user = Auth::id();
+        $screening = Offline::where('user_id', $user)->first();
+        $visitCount = Offline::where('created_at', '>=', now()->subMonths(3))->count();
+        return Inertia::render('Dashboard', [
+            'screening' => $screening,
+            'visitCount' => $visitCount,
+        ]);
     }
 
-    public function DetailScreeningOffline($id){
+    public function profile(Request $request): Response
+    {
+        return Inertia::render('Profile/Patients', [
+            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'status' => session('status'),
+        ]);
+    }
 
+    public function DetailScreeningOffline($id)
+    {
         $screening = Offline::findOrFail($id);
-        $question = $this->getScreeningQuestions();
+
+        $this->authorize('view', $screening);
+        $question = ScreeningOfflineHelper::getScreeningQuestions();
+
         return Inertia::render('Patients/Screening/Detail/Index', [
             'screening' => $screening,
             'question' => $question,
         ]);
     }
-
-    private function getScreeningQuestions()
+    public function DetailScreeningOnline($id)
     {
-        return [
-            'physical_health_q1' => 'Apakah Anda memiliki riwayat penyakit berikut ini?',
-            'physical_health_q2' => 'Kapan terakhir kali Anda Melakukan Pemeriksaan kesehatan umum?',
-            'physical_health_q3' => 'Apakah Anda memiliki masalah dengan:',
-            'physical_health_q4' => 'Apakah Anda sedang dalam pengobatan rutin atau menggunakan obat tertentu? jika ya, sebutkan:',
-            'physical_health_q5' => 'Bagaimana Anda menilai kondisi fisik Anda saat ini untuk pendakian (misal: kekuatan otot, keseimbangan, stamina)?',
-            'physical_health_q6' => 'Apakah Anda memiliki alergi (terhadap makanan, obat, atau lainnya)? Jika Ya, Sebutkan:',
-            'experience_knowledge_q1' => 'Apakah Anda pernah mendaki Gunung Semeru sebelumnya?',
-            'experience_knowledge_q2' => 'Apakah Anda pernah mengalami Altitude Sickness (mabuk ketinggian)?',
-            'experience_knowledge_q3' => 'Apakah Anda mengetahui cara menangani situasi darurat seperti hipotermia, dehidrasi, atau cedera selama pendakian?',
-            'experience_knowledge_q4' => 'Apakah Anda membawa atau tahu cara menggunakan perlengkapan berikut? (Centang semua yang sesuai)?',
-            'experience_knowledge_q5' => 'Bagaimana persiapan Anda menghadapi perubahan cuaca di Gunung Semeru?',
-        ];
+        $screening = Online::findOrFail($id);
+
+        // Authorize the action using the view policy in OnlinePolicy
+        $this->authorize('online', $screening);
+
+        $question = ScreeningOfflineHelper::getScreeningQuestions();
+
+        return Inertia::render('Patients/Screening/Detail/Online', [
+            'screening' => $screening,
+            'question' => $question,
+        ]);
     }
+
+
+    public function generateScreeningOfflinePDFReport($screeningId)
+    {
+        // Ambil data screening offline berdasarkan ID
+        $screening = Offline::findOrFail($screeningId);
+
+        // Otorisasi akses
+        $this->authorize('view', $screening);
+
+        // Data yang akan dikirim ke view PDF
+        $data = [
+            'full_name' => $screening->full_name,
+            'age' => $screening->age,
+            'gender' => $screening->gender,
+            'health_check_result' => $screening->health_check_result,
+            'planned_hiking_date' => $screening->planned_hiking_date,
+        ];
+
+        // Render view untuk PDF
+        $pdf = Pdf::loadView('report.patients.screening_pdf', $data);
+
+        // Format nama file PDF dengan nama pasien dan tanggal saat ini
+        $fileName = sprintf('%s_%s.pdf',
+                            str_replace(' ', '_', $screening->full_name),
+                            now()->format('Ymd_His'));
+        return $pdf->download($fileName);
+    }
+
 }

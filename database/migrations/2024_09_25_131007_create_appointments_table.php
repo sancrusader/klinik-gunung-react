@@ -10,8 +10,8 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    { 
-            Schema::create('appointments', function (Blueprint $table) {
+    {
+        Schema::create('appointments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('doctor_id')->constrained('users')->onDelete('cascade');
@@ -26,7 +26,6 @@ return new class extends Migration
             $table->timestamps();
 
         });
-
 
     }
 

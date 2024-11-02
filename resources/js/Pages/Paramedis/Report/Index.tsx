@@ -45,7 +45,7 @@ export default function Report({
     });
 
     const handleDownload = () => {
-        window.location.href = "/dashboard/paramedis/generate/report"; // Ubah URL sesuai route yang ditentukan
+        window.location.href = "/dashboard/paramedis/generate/report";
     };
 
     return (
@@ -53,7 +53,7 @@ export default function Report({
             <Head title="Laporan Aktivitas" />
             <div className="container mx-auto px-4 py-8">
                 <h1 className="text-3xl font-bold mb-8 text-gray-800">
-                    Daily Report
+                    Laporan Screening
                 </h1>
 
                 <button

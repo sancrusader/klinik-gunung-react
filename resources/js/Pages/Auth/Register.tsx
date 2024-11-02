@@ -13,13 +13,8 @@ import {
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/Components/ui/select";
+import AuthLayout from "@/Layouts/Auth/AuthLayout";
+
 
 export default function Component() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -51,7 +46,7 @@ export default function Component() {
     };
 
     return (
-        <section className="flex h-screen items-center justify-center">
+        <AuthLayout>
             <Head title="Register" />
             <Card className="mx-auto w-full max-w-sm">
                 <CardHeader>
@@ -68,6 +63,7 @@ export default function Component() {
                                 id="name"
                                 name="name"
                                 value={data.name}
+                                placeholder="Name"
                                 onChange={(e) =>
                                     setData("name", e.target.value)
                                 }
@@ -86,6 +82,7 @@ export default function Component() {
                                 type="email"
                                 name="email"
                                 value={data.email}
+                                placeholder="yourname@example.com"
                                 onChange={(e) =>
                                     setData("email", e.target.value)
                                 }
@@ -106,6 +103,7 @@ export default function Component() {
                                     type={showPassword ? "text" : "password"}
                                     name="password"
                                     value={data.password}
+                                    placeholder="********"
                                     onChange={(e) =>
                                         setData("password", e.target.value)
                                     }
@@ -150,6 +148,7 @@ export default function Component() {
                                     }
                                     name="password_confirmation"
                                     value={data.password_confirmation}
+                                    placeholder="********"
                                     onChange={(e) =>
                                         setData(
                                             "password_confirmation",
@@ -193,6 +192,15 @@ export default function Component() {
                             {processing ? "Registering..." : "Register"}
                         </Button>
                     </form>
+                    <Button
+                        variant="outline"
+                        className="w-full mt-4"
+                        onClick={() => {
+                            window.location.href = '/auth/google/redirect';
+                        }}
+                    >
+                        Register with Google
+                    </Button>
                     <div className="mt-4 text-center text-sm">
                         Already have an account?{" "}
                         <Link href={route("login")} className="underline">
@@ -201,6 +209,6 @@ export default function Component() {
                     </div>
                 </CardContent>
             </Card>
-        </section>
+            </AuthLayout>
     );
 }

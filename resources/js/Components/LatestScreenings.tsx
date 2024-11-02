@@ -3,9 +3,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 interface Screening {
     id: number;
     full_name: string;
-    email: string; // Jika data ini tersedia, jika tidak, bisa dihilangkan
-    profile_picture: string; // Jika ada gambar profil, gunakan ini
-    created_at: string; // Waktu screening dibuat
+    email: string;
+    profile_picture: string;
+    created_at: string;
 }
 
 interface PageProps {
@@ -38,7 +38,6 @@ export function LatestScreenings(props: PageProps) {
                         <p className="text-sm font-medium leading-none">
                             {screening.full_name}
                         </p>
-                        {/* Jika email tersedia */}
                         {screening.email && (
                             <p className="text-sm text-muted-foreground">
                                 {screening.email}

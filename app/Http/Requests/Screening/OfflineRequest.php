@@ -41,6 +41,7 @@ class OfflineRequest extends FormRequest
             $rules["experience_knowledge_q{$index}"] = 'nullable|array';
             $rules["experience_knowledge_q{$index}.*"] = 'string';
         }
+
         return $rules;
     }
 }

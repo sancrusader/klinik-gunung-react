@@ -1,8 +1,7 @@
-"use client";
-
 import { FormEventHandler, useState } from "react";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { Button } from "@/Components/ui/button";
+import AuthLayout from "@/Layouts/Auth/AuthLayout";
 import {
     Card,
     CardContent,
@@ -43,7 +42,7 @@ export default function Component(
     };
 
     return (
-        <section className="flex items-center justify-center h-screen">
+        <AuthLayout>
             <Head title="Login" />
             <Card className="w-full max-w-sm mx-auto">
                 <CardHeader>
@@ -65,7 +64,7 @@ export default function Component(
                                 onChange={(e) =>
                                     setData("email", e.target.value)
                                 }
-                                required
+
                             />
                             {errors.email && (
                                 <p className="text-sm text-red-500">
@@ -95,7 +94,7 @@ export default function Component(
                                     onChange={(e) =>
                                         setData("password", e.target.value)
                                     }
-                                    required
+
                                 />
                                 <Button
                                     type="button"
@@ -129,10 +128,16 @@ export default function Component(
                         >
                             {processing ? "Logging in..." : "Login"}
                         </Button>
-                        <Button variant="outline" className="w-full">
-                            Login with Google
-                        </Button>
                     </form>
+                    <Button
+                        variant="outline"
+                        className="w-full mt-4"
+                        onClick={() => {
+                            window.location.href = '/auth/google/redirect';
+                        }}
+                    >
+                        Login with Google
+                    </Button>
                     <div className="mt-4 text-sm text-center">
                         Don&apos;t have an account?{" "}
                         <Link href={route("register")} className="underline">
@@ -141,6 +146,6 @@ export default function Component(
                     </div>
                 </CardContent>
             </Card>
-        </section>
+        </AuthLayout>
     );
 }

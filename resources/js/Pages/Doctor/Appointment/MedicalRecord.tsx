@@ -6,6 +6,7 @@ import { Button } from "@/Components/ui/button";
 import { Textarea } from "@/Components/ui/textarea";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
+import DoctorSidebar from "@/Layouts/Dashboard/DoctorSidebar";
 import {
     Card,
     CardContent,
@@ -53,6 +54,7 @@ export default function MedicalRecordForm({
     };
 
     return (
+        <DoctorSidebar header={'Medical Record'}>
         <section className="flex h-screen items-center justify-center">
             <Card className="w-full max-w-2xl mx-auto">
                 <CardHeader>
@@ -137,5 +139,6 @@ export default function MedicalRecordForm({
                 </CardFooter>
             </Card>
         </section>
+        </DoctorSidebar>
     );
 }

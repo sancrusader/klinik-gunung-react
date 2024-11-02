@@ -6,8 +6,8 @@ import { Checkbox } from "@/Components/ui/checkbox";
 import { Button } from "@/Components/ui/button";
 import { Label } from "@/Components/ui/label";
 import { Alert, AlertDescription } from "@/Components/ui/alert";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Input } from "@/Components/ui/input";
+import Sidebar from "@/Layouts/Dashboard/Sidebar";
 import {
     Card,
     CardContent,
@@ -15,6 +15,7 @@ import {
     CardTitle,
     CardDescription,
 } from "@/Components/ui/card";
+import { Toaster, toast } from "sonner";
 import {
     Select,
     SelectContent,
@@ -105,10 +106,16 @@ const Offline: React.FC<{
         e.preventDefault();
         post(route("screening.offline.store"), {
             onSuccess: () => {
-                setSuccessMessage("Screening form submitted successfully!");
+                toast.success(
+                    `Screening untuk ${data.full_name} Berhasil Dibuat!`
+                );
             },
             onError: () => {
                 setSuccessMessage(null);
+                toast.error(
+                    "Failed to submit screening form. Please check the errors and try again."
+                );
+                console.error(errors);
             },
         });
     };
@@ -200,8 +207,9 @@ const Offline: React.FC<{
     );
 
     return (
-        <AuthenticatedLayout user={auth.user}>
+        <Sidebar header={'Offline Screening'}>
             <Head title="Screening Offline" />
+            <Toaster position="top-center" />
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <Card>
@@ -453,7 +461,7 @@ const Offline: React.FC<{
                     </Card>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </Sidebar>
     );
 };
 

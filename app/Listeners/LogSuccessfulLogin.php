@@ -2,10 +2,9 @@
 
 namespace App\Listeners;
 
-
+use App\Models\Activity\UserActivity;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\Login;
-use App\Models\Activity\UserActivity;
 
 class LogSuccessfulLogin
 {

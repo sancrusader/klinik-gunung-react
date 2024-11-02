@@ -12,7 +12,7 @@ import {
     SelectValue,
 } from "@/Components/ui/select";
 import { Button } from "@/Components/ui/button";
-import { Checkbox } from "@/Components/ui/checkbox";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/Components/ui/input";
 
 interface Screening {
@@ -22,9 +22,9 @@ interface Screening {
 
 interface FormData {
     payment_method: string;
-    amount_paid: string; // Harga screening
-    quantity_product: string; // Jumlah produk (input)
-    total_price_product: string; // Total harga produk (input)
+    amount_paid: string;
+    quantity_product: string;
+    total_price_product: string;
     payment_proof: File | null;
 }
 
@@ -41,6 +41,11 @@ export default function PaymentForm({ screening }: { screening: Screening }) {
 
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
+
+        if ((data.payment_method === "qris" || data.payment_method === "transfer") && !data.payment_proof) {
+            toast.error("Bukti pembayaran diperlukan untuk metode ini.");
+            return;
+        }
 
         post(route("cashier.payment.offline", screening.id), {
             preserveState: true,
@@ -61,10 +66,8 @@ export default function PaymentForm({ screening }: { screening: Screening }) {
         setData("payment_proof", file);
     };
 
-    const screeningPrice = parseInt(data.amount_paid) || 0; // Harga screening
-    const productTotalPrice = parseInt(data.total_price_product) || 0; // Total harga produk
-
-    // Total akhir dari screening dan total harga produk
+    const screeningPrice = parseInt(data.amount_paid) || 0;
+    const productTotalPrice = parseInt(data.total_price_product) || 0;
     const finalTotal = screeningPrice + productTotalPrice;
 
     return (
@@ -80,91 +83,53 @@ export default function PaymentForm({ screening }: { screening: Screening }) {
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-2">
-                            <Label
-                                htmlFor="payment-method"
-                                className="text-base font-semibold"
-                            >
+                            <Label htmlFor="payment-method" className="text-base font-semibold">
                                 Metode Pembayaran
                             </Label>
                             <RadioGroup
                                 id="payment-method"
                                 value={data.payment_method}
-                                onValueChange={(value) =>
-                                    setData("payment_method", value)
-                                }
+                                onValueChange={(value) => setData("payment_method", value)}
                                 className="flex flex-col space-y-2"
                             >
                                 {["qris", "cash", "transfer"].map((method) => (
-                                    <div
-                                        key={method}
-                                        className="flex items-center space-x-2"
-                                    >
-                                        <RadioGroupItem
-                                            value={method}
-                                            id={method}
-                                        />
-                                        <Label htmlFor={method}>
-                                            {method.toUpperCase()}
-                                        </Label>
+                                    <div key={method} className="flex items-center space-x-2">
+                                        <RadioGroupItem value={method} id={method} />
+                                        <Label htmlFor={method}>{method.toUpperCase()}</Label>
                                     </div>
                                 ))}
                             </RadioGroup>
                             {errors.payment_method && (
-                                <p className="text-sm text-red-500">
-                                    {errors.payment_method}
-                                </p>
+                                <p className="text-sm text-red-500">{errors.payment_method}</p>
                             )}
                         </div>
 
                         <div className="space-y-2">
-                            <Label
-                                htmlFor="price"
-                                className="text-base font-semibold"
-                            >
+                            <Label htmlFor="price" className="text-base font-semibold">
                                 Harga Screening
                             </Label>
-                            <Select
-                                value={data.amount_paid}
-                                onValueChange={(value) =>
-                                    setData("amount_paid", value)
-                                }
-                            >
+                            <Select value={data.amount_paid} onValueChange={(value) => setData("amount_paid", value)}>
                                 <SelectTrigger id="price">
                                     <SelectValue placeholder="Pilih harga" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {[50000, 100000, 150000, 200000].map(
-                                        (price) => (
-                                            <SelectItem
-                                                key={price}
-                                                value={price.toString()}
-                                            >
-                                                Rp{" "}
-                                                {price.toLocaleString("id-ID")}
-                                            </SelectItem>
-                                        )
-                                    )}
+                                    {[50000, 100000, 150000, 200000].map((price) => (
+                                        <SelectItem key={price} value={price.toString()}>
+                                            Rp {price.toLocaleString("id-ID")}
+                                        </SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
-                            {errors.amount_paid && (
-                                <p className="text-sm text-red-500">
-                                    {errors.amount_paid}
-                                </p>
-                            )}
+                            {errors.amount_paid && <p className="text-sm text-red-500">{errors.amount_paid}</p>}
                         </div>
 
                         <div className="flex items-center space-x-2">
                             <Checkbox
                                 id="buy-product"
                                 checked={hasPurchasedProduct}
-                                onCheckedChange={() =>
-                                    setHasPurchasedProduct(!hasPurchasedProduct)
-                                }
+                                onCheckedChange={() => setHasPurchasedProduct(!hasPurchasedProduct)}
                             />
-                            <Label
-                                htmlFor="buy-product"
-                                className="text-base font-semibold"
-                            >
+                            <Label htmlFor="buy-product" className="text-base font-semibold">
                                 Apakah pasien membeli produk?
                             </Label>
                         </div>
@@ -172,72 +137,44 @@ export default function PaymentForm({ screening }: { screening: Screening }) {
                         {hasPurchasedProduct && (
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label
-                                        htmlFor="product-name"
-                                        className="text-base font-semibold"
-                                    >
-                                        Jumlah Produk (opsional)
+                                    <Label htmlFor="product-name" className="text-base font-semibold">
+                                        Jumlah Produk
                                     </Label>
                                     <Input
                                         type="number"
                                         id="product-name"
                                         value={data.quantity_product}
-                                        onChange={(e) =>
-                                            setData(
-                                                "quantity_product",
-                                                e.target.value
-                                            )
-                                        }
-                                        placeholder="Masukkan jumlah produk (opsional)"
+                                        onChange={(e) => setData("quantity_product", e.target.value)}
+                                        placeholder="Masukkan jumlah produk"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label
-                                        htmlFor="product-price"
-                                        className="text-base font-semibold"
-                                    >
-                                        Total Harga Produk (opsional)
+                                    <Label htmlFor="product-price" className="text-base font-semibold">
+                                        Total Harga Produk
                                     </Label>
                                     <Input
                                         type="number"
                                         id="product-price"
                                         value={data.total_price_product}
-                                        onChange={(e) =>
-                                            setData(
-                                                "total_price_product",
-                                                e.target.value
-                                            )
-                                        }
-                                        placeholder="Masukkan total harga produk (opsional)"
+                                        onChange={(e) => setData("total_price_product", e.target.value)}
+                                        placeholder="Masukkan total harga produk"
                                     />
                                 </div>
                             </div>
                         )}
 
-                        {(data.payment_method === "qris" ||
-                            data.payment_method === "transfer") && (
+                        {(data.payment_method === "qris" || data.payment_method === "transfer") && (
                             <div className="space-y-4">
-                                <Label
-                                    htmlFor="payment-proof"
-                                    className="text-base font-semibold"
-                                >
+                                <Label htmlFor="payment-proof" className="text-base font-semibold">
                                     Upload Bukti Pembayaran
                                 </Label>
-                                <Input
-                                    type="file"
-                                    id="payment-proof"
-                                    accept="image/*"
-                                    onChange={handleFileChange}
-                                />
+                                <Input type="file" id="payment-proof" accept="image/*" onChange={handleFileChange} />
                                 {errors.payment_proof && (
-                                    <p className="text-sm text-red-500">
-                                        {errors.payment_proof}
-                                    </p>
+                                    <p className="text-sm text-red-500">{errors.payment_proof}</p>
                                 )}
                             </div>
                         )}
 
-                        {/* Tampilkan rincian harga screening dan total produk */}
                         {data.amount_paid && (
                             <div className="mt-4">
                                 <h3 className="text-lg font-semibold">Rincian Pembayaran</h3>
@@ -245,19 +182,13 @@ export default function PaymentForm({ screening }: { screening: Screening }) {
                                 {hasPurchasedProduct && data.total_price_product && (
                                     <>
                                         <p>Total Harga Produk: Rp {productTotalPrice.toLocaleString("id-ID")}</p>
-                                        <p className="font-bold">
-                                            Total Pembayaran: Rp {finalTotal.toLocaleString("id-ID")}
-                                        </p>
+                                        <p className="font-bold">Total Pembayaran: Rp {finalTotal.toLocaleString("id-ID")}</p>
                                     </>
                                 )}
                             </div>
                         )}
 
-                        <Button
-                            type="submit"
-                            className="w-full"
-                            disabled={processing}
-                        >
+                        <Button type="submit" className="w-full" disabled={processing}>
                             {processing ? "Memproses..." : "Bayar Sekarang"}
                         </Button>
                     </form>

@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers\Blog;
 
-use App\Models\User;
-use Inertia\Inertia;
+use App\Http\Controllers\Controller;
 use App\Models\Blog\Blog;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use Inertia\Inertia;
 
 class BlogController extends Controller
 {
     public function index()
     {
         $blogs = Blog::all();
+
         return Inertia::render('Blogs/Index', [
             'blogs' => $blogs,
         ]);

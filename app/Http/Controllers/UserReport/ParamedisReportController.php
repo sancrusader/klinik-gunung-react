@@ -2,19 +2,21 @@
 
 namespace App\Http\Controllers\UserReport;
 
-use Inertia\Inertia;
+use App\Http\Controllers\Controller;
+use App\Models\Activity\UserActivity;
+use App\Models\Screening\Offline;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use App\Models\Screening\Offline;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Activity\UserActivity;
-use Barryvdh\DomPDF\Facade\Pdf as PDF;
+use Inertia\Inertia;
 
 class ParamedisReportController extends Controller
 {
-
-    // Report untuk paramedis perorangan
+    /**
+     * Summary of index
+     * @return \Inertia\Response
+     */
     public function index()
     {
         $activities = UserActivity::where('user_id', Auth::id())->get();
@@ -23,13 +25,51 @@ class ParamedisReportController extends Controller
         $lastLogin = $activities->where('activity_type', 'login')->sortByDesc('created_at')->first();
         $lastLogout = $activities->where('activity_type', 'logout')->sortByDesc('created_at')->first();
 
+        // Convert login and logout times to Jakarta time zone
+        $lastLoginTime = $lastLogin ? Carbon::parse($lastLogin->created_at)->timezone('Asia/Jakarta')->format('Y-m-d H:i:s') : null;
+        $lastLogoutTime = $lastLogout ? Carbon::parse($lastLogout->created_at)->timezone('Asia/Jakarta')->format('Y-m-d H:i:s') : null;
+
         $screenings = Offline::where('paramedic_id', Auth::id())->with('user')->get();
-        return Inertia::render("Paramedis/Report/Index", [
+
+        return Inertia::render('Paramedis/Report/Personal/Index', [
             'activities' => $activities,
             'screeningCount' => $screeningCount,
-            'lastLogin' => $lastLogin ? $lastLogin->created_at : null,
-            'lastLogout' => $lastLogout ? $lastLogout->created_at : null,
+            'lastLogin' => $lastLoginTime,
+            'lastLogout' => $lastLogoutTime,
             'screenings' => $screenings,
+        ]);
+    }
+
+    // Daily Report untuk Paramedis
+    public function DailyReport(Request $request)
+    {
+        // Validasi input tanggal opsional
+        $request->validate([
+            'date' => 'nullable|date',
+        ]);
+
+        // Ambil tanggal yang dikirim dari request
+        $date = $request->input('date');
+
+        // Jika tidak ada input tanggal, gunakan hari ini
+        if (! $date) {
+            $date = now()->toDateString();
+        }
+        $reports = Offline::whereDate('created_at', $date)
+            ->with(['paramedis', 'user'])
+            ->get();
+        $summary = $reports->groupBy('health_check_result')->map(function ($group) {
+            return $group->count();
+        });
+
+        // Count patients with heart disease in 'physical_health_q1'
+        $physicalHealth = $reports->where('physical_health_q1', 'penyakit jantung')->count();
+
+        return Inertia::render('Paramedis/Report/Daily/Index', [
+            'date' => $date,  // Pastikan tanggal dikirim kembali ke frontend
+            'reports' => $reports,
+            'summary' => $summary,
+            'physical_health' => $physicalHealth,
         ]);
     }
 
@@ -46,35 +86,7 @@ class ParamedisReportController extends Controller
         $currentDate = Carbon::now()->format('Y-m-d');
         $fileName = "activity_report_{$userName}_{$currentDate}.pdf";
         $pdf = PDF::loadView('report.paramedis.activity_report', $data);
+
         return $pdf->download($fileName);
-    }
-
-    // Report untuk semua paramedis agar bisa melihat report harian
-    public function DailyReport(Request $request)
-    {
-        // Validasi parameter yang diperlukan, jika ada
-        $request->validate([
-            'date' => 'nullable|date' // Misalnya, jika ingin filter berdasarkan tanggal
-        ]);
-
-        // Ambil tanggal yang ingin dilihat laporan harian
-        $date = $request->input('date') ?? now()->toDateString(); // Gunakan hari ini jika tidak ada input
-
-        // Ambil data laporan berdasarkan tanggal
-        $reports = Offline::whereDate('created_at', $date)
-            ->with('paramedic') // Misalkan ada relasi dengan model Paramedic
-            ->get();
-
-        // Jika Anda ingin menampilkan jumlah cek kesehatan berdasarkan hasil
-        $summary = $reports->groupBy('health_check_result')->map(function ($group) {
-            return $group->count();
-        });
-
-        // Kembalikan view dengan data laporan
-        return view('reports.daily', [
-            'date' => $date,
-            'reports' => $reports,
-            'summary' => $summary,
-        ]);
     }
 }

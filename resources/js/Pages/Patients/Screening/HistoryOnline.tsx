@@ -1,142 +1,86 @@
-import { PageProps } from "@/types";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { usePage, Head, Link } from "@inertiajs/react";
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/Components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import { Button } from "@/Components/ui/button";
-import { Input } from "@/Components/ui/input";
-import {  PlusIcon, SearchIcon } from "lucide-react";
-import { ScreeningOnline } from "@/types/screening";
+import { Head } from '@inertiajs/react';
+import { Alert, AlertDescription, AlertTitle } from '@/Components/ui/alert';
+import SideBar from "@/Layouts/Dashboard/Sidebar";
+import ScreeningInfo from '@/Components/Screening/ScreeningInfo';
+import NoScreeningData from '@/Components/Screening/NoScreeningData';
+import { PageProps, User } from '@/types';
+import { CheckCircle, DollarSign } from 'lucide-react';
+import { Button } from '@/Components/ui/button';
+import { Link } from '@inertiajs/react';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/Components/ui/card";
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 
-interface Props extends PageProps {
-    screenings: ScreeningOnline[];
+interface Screening {
+    id: number;
+    full_name: string;
+    email: string;
+    queue_number: number;
+    status: 'completed' | 'pending' | 'cancelled';
+    created_at: string;
+    health_check_result: string;
+    isOnline: boolean;
+    payment_status: boolean;
 }
 
-export default function ScreeningOnlineList({ auth }: Props) {
-    const { screenings } = usePage<Props>().props;
-    const screeningList = Array.isArray(screenings) ? screenings : [];
+interface HistoryOnlineProps {
+    auth: {
+        user: User;
+    };
+    screening: Screening | null;
+}
+
+export default function HistoryOnline({ auth, screening }: HistoryOnlineProps) {
+    const hasScreening = screening !== null;
+    const showAlert = screening && !screening.payment_status;
+
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Online Screening
-                </h2>
-            }
-        >
-            <Head title="Online Screening" />
-
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-2xl font-bold">
-                                Online Screening List
-                            </CardTitle>
-                            <Link href={route("screening.online.create")}>
-                                <Button>
-                                    <PlusIcon className="mr-2 h-4 w-4" />
-                                    Create Screening
-                                </Button>
-                            </Link>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-center space-x-2 mb-4">
-                                <Input
-                                    placeholder="Search screenings..."
-                                    className="max-w-sm"
-                                />
-                                <Button variant="secondary">
-                                    <SearchIcon className="h-4 w-4 mr-2" />
-                                    Search
+        <SideBar header={'Screening Now'}>
+            <Head title='Screening Status'/>
+            <div className="container mx-auto py-6 px-4 max-w-full">
+                {hasScreening && screening?.status === 'completed' && (
+                    <Alert className="mb-6">
+                        <CheckCircle className="h-4 w-4" />
+                        <AlertTitle>Screening Completed Successfully</AlertTitle>
+                        <AlertDescription>
+                            Thank you for completing the screening, {auth.user.name}.
+                        </AlertDescription>
+                    </Alert>
+                )}
+        {showAlert && (
+                <Alert variant="destructive" className="mb-4">
+                <ExclamationTriangleIcon className="h-4 w-4" />
+                <AlertTitle>Information</AlertTitle>
+                <AlertDescription>
+                    Please complete the payment first to view the results.
+                </AlertDescription>
+                </Alert>
+            )}
+                <Card className="w-full">
+                    <CardHeader className="border-b bg-muted/40">
+                        <CardTitle className="text-2xl font-bold">Screening Online Status</CardTitle>
+                        <CardDescription>
+                            View and manage your screening information
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-6">
+                        {hasScreening ? (
+                            <ScreeningInfo screening={screening} detailRouteName={route('detail.screening.online', screening.id)} />
+                        ) : (
+                            <NoScreeningData detailRouteName={route('screening.online.history')} />
+                        )}
+                            {screening?.id && (
+                            <div className='flex flex-col sm:flex-row gap-4'>
+                                <Button asChild>
+                                    <Link href={route('screening.oline.payment', screening.id)}>
+                                        Payment Now
+                                    </Link>
                                 </Button>
                             </div>
-                            <Table>
-                                <TableCaption>
-                                    List of Online Screening Entries
-                                </TableCaption>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="w-[100px]">
-                                            Queue Number
-                                        </TableHead>
-                                        <TableHead>Full Name</TableHead>
-                                        <TableHead>Date of Birth</TableHead>
-                                        <TableHead>Citizenship</TableHead>
-                                        <TableHead>Country</TableHead>
-                                        <TableHead>Address</TableHead>
-                                        <TableHead>Phone</TableHead>
-                                        <TableHead>Email</TableHead>
-                                        <TableHead>Status</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {screeningList.length > 0 ? (
-                                        screeningList.map((screening) => (
-                                            <TableRow key={screening.id}>
-                                                {/* Your TableCell here */}
-                                                <TableCell>
-                                                    {screening.queue_number}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {screening.full_name}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {screening.date_of_birth}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {screening.citizenship}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {screening.country}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {screening.address}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {screening.phone}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {screening.email}
-                                                </TableCell>
-                                                <TableCell className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                                    {screening.payment_confirmed ? (
-                                                        <span className="text-green-600 dark:text-green-400">
-                                                            Paid
-                                                        </span>
-                                                    ) : (
-                                                        <span className="text-red-600 dark:text-red-400">
-                                                            Not Paid
-                                                        </span>
-                                                    )}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                    ) : (
-                                        <TableRow>
-                                            <TableCell
-                                                colSpan={8}
-                                                className="text-center"
-                                            >
-                                                No screenings available.
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
-                </div>
+                        )}
+                    </CardContent>
+                </Card>
             </div>
-        </AuthenticatedLayout>
+        </SideBar>
     );
 }

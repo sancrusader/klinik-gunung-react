@@ -23,6 +23,6 @@ class Scan extends Model
         'question3',
         'additional_notes',
         'status',
-        'queue_number'
+        'queue_number',
     ];
 }

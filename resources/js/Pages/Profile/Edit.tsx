@@ -1,44 +1,188 @@
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import DeleteUserForm from "./Partials/DeleteUserForm";
-import UpdatePasswordForm from "./Partials/UpdatePasswordForm";
-import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm";
-import { Head } from "@inertiajs/react";
-import { PageProps } from "@/types";
+import { z } from 'zod'
+import { Link } from '@inertiajs/react'
+import { useFieldArray, useForm } from 'react-hook-form'
+import { Button } from '@/Components/ui/button'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/Components/ui/form'
+import { Input } from '@/Components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/Components/ui/select'
+import { Textarea } from '@/Components/ui/textarea'
+import { toast } from '@/hooks/use-toast'
+import { cn } from '@/lib/utils'
+import { zodResolver } from '@hookform/resolvers/zod'
 
-export default function Edit({
-    auth,
-    mustVerifyEmail,
-    status,
-}: PageProps<{ mustVerifyEmail: boolean; status?: string }>) {
-    return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Profile
-                </h2>
-            }
-        >
-            <Head title="Profile" />
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                    <div className="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                        <UpdateProfileInformationForm
-                            mustVerifyEmail={mustVerifyEmail}
-                            status={status}
-                            className="max-w-xl"
-                        />
-                    </div>
+const profileFormSchema = z.object({
+  username: z
+    .string()
+    .min(2, {
+      message: 'Username must be at least 2 characters.',
+    })
+    .max(30, {
+      message: 'Username must not be longer than 30 characters.',
+    }),
+  email: z
+    .string({
+      required_error: 'Please select an email to display.',
+    })
+    .email(),
+  bio: z.string().max(160).min(4),
+  urls: z
+    .array(
+      z.object({
+        value: z.string().url({ message: 'Please enter a valid URL.' }),
+      })
+    )
+    .optional(),
+})
 
-                    <div className="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                        <UpdatePasswordForm className="max-w-xl" />
-                    </div>
+type ProfileFormValues = z.infer<typeof profileFormSchema>
 
-                    <div className="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                        <DeleteUserForm className="max-w-xl" />
-                    </div>
-                </div>
-            </div>
-        </AuthenticatedLayout>
-    );
+// This can come from your database or API.
+const defaultValues: Partial<ProfileFormValues> = {
+  bio: 'I own a computer.',
+  urls: [
+    { value: 'https://shadcn.com' },
+    { value: 'http://twitter.com/shadcn' },
+  ],
+}
+
+export default function ProfileForm() {
+  const form = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileFormSchema),
+    defaultValues,
+    mode: 'onChange',
+  })
+
+  const { fields, append } = useFieldArray({
+    name: 'urls',
+    control: form.control,
+  })
+
+  function onSubmit(data: ProfileFormValues) {
+    toast({
+      title: 'You submitted the following values:',
+      description: (
+        <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
+          <code className='text-white'>{JSON.stringify(data, null, 2)}</code>
+        </pre>
+      ),
+    })
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+        <FormField
+          control={form.control}
+          name='username'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input placeholder='shadcn' {...field} />
+              </FormControl>
+              <FormDescription>
+                This is your public display name. It can be your real name or a
+                pseudonym. You can only change this once every 30 days.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name='email'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Select a verified email to display' />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value='m@example.com'>m@example.com</SelectItem>
+                  <SelectItem value='m@google.com'>m@google.com</SelectItem>
+                  <SelectItem value='m@support.com'>m@support.com</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                You can manage verified email addresses in your{' '}
+                <Link href='/examples/forms'>email settings</Link>.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name='bio'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Bio</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder='Tell us a little bit about yourself'
+                  className='resize-none'
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                You can <span>@mention</span> other users and organizations to
+                link to them.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div>
+          {fields.map((field, index) => (
+            <FormField
+              control={form.control}
+              key={field.id}
+              name={`urls.${index}.value`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className={cn(index !== 0 && 'sr-only')}>
+                    URLs
+                  </FormLabel>
+                  <FormDescription className={cn(index !== 0 && 'sr-only')}>
+                    Add links to your website, blog, or social media profiles.
+                  </FormDescription>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ))}
+          <Button
+            type='button'
+            variant='outline'
+            size='sm'
+            className='mt-2'
+            onClick={() => append({ value: '' })}
+          >
+            Add URL
+          </Button>
+        </div>
+        <Button type='submit'>Update profile</Button>
+      </form>
+    </Form>
+  )
 }

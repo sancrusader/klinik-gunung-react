@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, FormEvent } from "react";
 import { useForm, Head } from "@inertiajs/react";
 import { Button } from "@/Components/ui/button";
@@ -14,9 +12,8 @@ import {
     CardDescription,
 } from "@/Components/ui/card";
 import { Toaster, toast } from "sonner";
-import AdminLayout from "@/Layouts/AdminLayout";
 import { PageProps } from "@/types";
-
+import AdminSidebar from "@/Layouts/Dashboard/AdminSidebar";
 type FormData = {
     name: string;
     email: string;
@@ -52,7 +49,7 @@ export default function Create({auth}:PageProps) {
     };
 
     return (
-        <AdminLayout user={auth.user.name}>
+        <AdminSidebar header={'Create Users'}>
             <Head title="Tambah User" />
             <Toaster position="top-center"/>
             <div className="py-12">
@@ -157,6 +154,6 @@ export default function Create({auth}:PageProps) {
                     </Card>
                 </div>
             </div>
-        </AdminLayout>
+        </AdminSidebar>
     );
 }
